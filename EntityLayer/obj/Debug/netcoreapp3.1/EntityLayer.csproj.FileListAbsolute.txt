@@ -1,0 +1,15 @@
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\obj\Debug\netcoreapp3.1\EntityLayer.csprojAssemblyReference.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\obj\Debug\netcoreapp3.1\EntityLayer.AssemblyInfoInputs.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\obj\Debug\netcoreapp3.1\EntityLayer.AssemblyInfo.cs
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\obj\Debug\netcoreapp3.1\EntityLayer.csproj.CoreCompileInputs.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\bin\Debug\netcoreapp3.1\EntityLayer.deps.json
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\bin\Debug\netcoreapp3.1\EntityLayer.runtimeconfig.json
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\bin\Debug\netcoreapp3.1\EntityLayer.runtimeconfig.dev.json
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\bin\Debug\netcoreapp3.1\EntityLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\bin\Debug\netcoreapp3.1\EntityLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\bin\Debug\netcoreapp3.1\SharedLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\bin\Debug\netcoreapp3.1\SharedLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\obj\Debug\netcoreapp3.1\EntityLayer.csproj.CopyComplete
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\obj\Debug\netcoreapp3.1\EntityLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\obj\Debug\netcoreapp3.1\EntityLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\EntityLayer\obj\Debug\netcoreapp3.1\EntityLayer.genruntimeconfig.cache

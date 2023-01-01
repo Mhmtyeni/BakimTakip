@@ -1,0 +1,195 @@
+﻿@model ProjectListDto
+<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>PROJELER</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Proje Bilgileri</strong></h3>
+                                <br />
+                                @if (Model != null)
+                                {
+                                    @if (Model.Projects.Count > 0)
+                                    {
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Proje İsmi</th>
+                                                    <th>Fabrika İsmi</th>
+                                                    <th>Bölüm İsmi</th>
+                                                    @if (User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                                                    {
+                                                    <th>Araçlar</th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model.Projects)
+                                                {
+                                                    <tr>
+                                                        <td onclick="selectProject(@item.Id)">@item.Name</td>
+                                                        <td>@item.FactoryDepartment.Factory.Name</td>
+                                                        <td>@item.FactoryDepartment.Name</td>
+                                                        @if (User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                                                        {
+                                                        <td>
+                                                            <a class="btn btn-warning" onclick="editProject(@item.Id)">
+                                                                Düzenle
+                                                            </a>
+                                                            <a class="btn btn-primary" onclick="editEquipment(@item.Id)">
+                                                                Ekipman Ekle/Çıkar
+                                                            </a>
+                                                            <a class="btn btn-success" onclick="editRobot(@item.Id)">
+                                                                Robot Ekle/Çıkar
+                                                            </a>
+                                                        </td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <center><i>Proje bulunamadı!</i></center>
+                                    }
+                                }
+                                else
+                                {
+                                    <center><i>Proje bulunamadı!</i></center>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="selectProjectModalPage"></div>
+<div id="editProjectModalPage"></div>
+<div id="editProjectEquipmentModalPage"></div>
+<div id="editProjectRobotModalPage"></div>
+<script>
+    // =======================
+    function selectProject(projectId) {
+        $.ajax({
+            url: '/Project/Select/?Id=' + projectId,
+            success: function (data) {
+                $('#selectProjectModalPage').html(data);
+                $('#selectProjectModal').modal('show');
+            }
+        });
+    }
+    // =======================
+    var projectId = 0;
+    function editProject(projectId) {
+        $.ajax({
+            url: '/Project/Edit/?Id=' + projectId,
+            success: function (data) {
+                $('#editProjectModalPage').html(data);
+                $('#editProjectModal').modal('show');
+            }
+        });
+    }
+    // =======================
+    function editEquipment(projectId) {
+        $.ajax({
+            url: '/Project/EquipmentEdit/?Id=' + projectId,
+            success: function (data) {
+                $('#editProjectEquipmentModalPage').html(data);
+                $('#editProjectEquipmentModal').modal('show');
+            }
+        });
+    }
+    // =======================
+    // =======================
+    function editRobot(projectId) {
+        $.ajax({
+            url: '/Project/RobotEdit/?Id=' + projectId,
+            success: function (data) {
+                $('#editProjectRobotModalPage').html(data);
+                $('#editProjectRobotModal').modal('show');
+            }
+        });
+    }
+    // =======================
+</script>
+@*<script>
+        var equipmentMaintenanceDate;
+        $(document).ready(function () {
+            getDateTime()
+        });
+        // ========================
+        // DATETIME.NOW
+        // ========================
+        function getDateTime() {
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = now.getMonth() + 1;
+                var day = now.getDate();
+                if (month.toString().length == 1) {
+                    month = '0' + month;
+                }
+                if (day.toString().length == 1) {
+                    day = '0' + day;
+                }
+                equipmentMaintenanceDate = year + '-' + month + '-' + day;
+            }
+        // ==========================
+        function confirmMaintenance(Id) {
+            Swal.fire({
+                title: 'Bakımı onaylamak istiyor musunuz?',
+                text: "Bakım onaylandıktan sonra tekrar geri alınamaz!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Evet, onaylıyorum',
+                cancelButtonText: 'İptal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                   $.ajax({
+                    url: '@Url.Action("Edit", "EquipmentMaintenance")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Id': Id,
+                        'MaintenanceDate': equipmentMaintenanceDate,
+                        'DoneOrNotDone': 'True',
+                    },
+                    success: function (data) {
+                        if (data == true) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Başarıyla güncellenmiştir!',
+                                showConfirmButton: false,
+                                timer: 800
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Aynı isimde bir ekipman mevcut!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+                }
+            })
+            }
+    </script>*@

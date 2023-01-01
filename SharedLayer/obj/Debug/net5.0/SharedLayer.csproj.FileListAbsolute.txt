@@ -1,0 +1,12 @@
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\bin\Debug\net5.0\SharedLayer.deps.json
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\bin\Debug\net5.0\SharedLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\bin\Debug\net5.0\ref\SharedLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\bin\Debug\net5.0\SharedLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\obj\Debug\net5.0\SharedLayer.csprojAssemblyReference.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\obj\Debug\net5.0\SharedLayer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\obj\Debug\net5.0\SharedLayer.AssemblyInfoInputs.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\obj\Debug\net5.0\SharedLayer.AssemblyInfo.cs
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\obj\Debug\net5.0\SharedLayer.csproj.CoreCompileInputs.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\obj\Debug\net5.0\SharedLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\obj\Debug\net5.0\ref\SharedLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\SharedLayer\obj\Debug\net5.0\SharedLayer.pdb

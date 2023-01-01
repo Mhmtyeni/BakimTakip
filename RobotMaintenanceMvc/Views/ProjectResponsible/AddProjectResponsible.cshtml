@@ -1,0 +1,138 @@
+﻿<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>PROJEYE SORUMLU EKLE</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Proje ve Sorumlu Bilgileri</strong></h3>
+                            </div>
+                            <form id="form_id">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-md-4">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <br />
+                                            <label>Proje Seç</label>
+                                            <select name="select" id="project" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <label>Sorumlu Seç</label>
+                                            <select name="select" id="user" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <br />
+                                        </div>
+                                        <div class="col-md-4">
+                                        </div>
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <br />
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                </div>
+                                <div class="col-md-4">
+                                    <button id="add" onclick="postData()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">EKLE</button>
+                                </div>
+                                <div class="col-md-4">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        getProjects();
+        getUsers();
+    });
+
+    // ===============================
+    // Project
+    // ===============================
+    function getProjects() {
+        $.ajax({
+            type: "GET",
+            url: "/Project/GetAll",
+            data: "{}",
+            success: function (data) {
+                var s = '';
+                for (var i = 0; i < data.projects.$values.length; i++) {
+                    s += '<option value="' + data.projects.$values[i].id + '">' + data.projects.$values[i].name + '</option>';
+                }
+                $("#project").html(s);
+            }
+        });
+    }
+    // ===============================
+    // Users
+    // ===============================
+    function getUsers() {
+        $.ajax({
+            type: "GET",
+            url: "/AppUser/GetAll",
+            data: "{}",
+            success: function (data) {
+                var s = '';
+                for (var i = 0; i < data.appUsers.$values.length; i++) {
+                    s += '<option value="' + data.appUsers.$values[i].id + '">' + data.appUsers.$values[i].firstName + " " + data.appUsers.$values[i].lastName + '</option>';
+                }
+                $("#user").html(s);
+            }
+        });
+    }
+    // ===============================
+    // ===============================
+    function postData() {
+        if (document.forms['form_id'].reportValidity()) {
+            document.getElementById("add").disabled = true;
+            $.ajax({
+                url: '@Url.Action("Add", "ProjectResponsible")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'ProjectId': $("#project").val(),
+                    'AppUserId': $("#user").val(),
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bu kişi daha önce bu projeye zaten eklenmiş',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+
+
+</script>

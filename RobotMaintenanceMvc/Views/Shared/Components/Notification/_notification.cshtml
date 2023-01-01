@@ -1,0 +1,42 @@
+﻿@model EquipmentMaintenanceListDto
+@{ 
+    int notificationCount = 0;    
+ }
+<div id="navbar-menu">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a style="margin-top:4px;margin-right:-20px;background-color:transparent" href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
+                        <img  style="width:23px;height:23px;" src="~/img/external-maintenance-seo-and-marketing-nawicon-detailed-outline-nawicon.png"/>
+                        @if (Model.EquipmentMaintenances.Count > 0)
+                        {
+                            <span style="margin-top:-4px;margin-right:-5px" class="badge bg-danger">@Model.EquipmentMaintenances.Count</span>
+                        }
+                    </a>
+                    <ul class="dropdown-menu notifications">
+                        <li><a  style="font-weight:bold">EKİPMAN BAKIM ONAY BİLDİRİMLERİ</a></li>
+                        @foreach (var item in Model.EquipmentMaintenances)
+                        {
+                            if(notificationCount<6)
+                            {
+                              <li>
+                                <a href="/EquipmentMaintenance/EquipmentMaintenance" class="notification-item">
+                                <span class="dot bg-danger"></span>
+                                <span style="font-weight:bold">@item.ProjectEquipment.Project.Name</span> 
+                                <span>projesindeki</span>  <span style="font-weight:bold">@item.ProjectEquipment.Equipment.Name</span> 
+                                <span>adlı ekipmanın bakım onayı gelmiştir!</span></a>
+                              </li>
+                                    notificationCount++;
+                            }
+                        }
+                           @if (Model.EquipmentMaintenances.Count == 0)
+                        {
+                            <li><a href="#" class="notification-item"><span class="dot bg-success"></span>Onaylanacak ekipman bakımı bulunmamaktadır.</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/EquipmentMaintenance/EquipmentMaintenance" class="more">Tüm bildirimler</a></li>
+                        } 
+                    </ul>
+                </li>
+            </ul>
+        </div>

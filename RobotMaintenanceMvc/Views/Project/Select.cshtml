@@ -1,0 +1,194 @@
+﻿@model ProjectEquipmentsAndProjectRobots
+@{
+    Layout = null;
+    //string projectName = "", projectFactoryName = "", projectDepartmentName = "";
+    int countEquipment = 1;
+    int countRobot = 1;
+    //foreach (var item in Model.ProjectEquipment)
+    //{
+    //    projectName = item.Project.Name;
+    //    projectFactoryName = item.Project.FactoryDepartment.Factory.Name;
+    //    projectDepartmentName = item.Project.FactoryDepartment.Name;
+    //}
+}
+<script src="~/js/excel-bootstrap-table-filter-bundle.min.js"></script>
+<link href="~/css/excel-bootstrap-table-filter-style.css" rel="stylesheet" />
+
+<div class="modal fade" id="selectProjectModal" tabindex="-1" role="dialog" aria-labelledby="scrollmodalLabel" aria-hidden="true" style="margin-top: 2%;width:auto; height:auto">
+    <div class="modal-dialog modal-lg" role="document" style="width:1400px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="modal-title" id="scrollmodalLabel">Proje</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <h3 class="panel-title" style="text-align:center"><strong>Ekipman Bilgileri</strong></h3>
+                                </div>
+                                <div class="col-md-2">
+                                    <a id="export" name="export" onclick="exportExcel(@Model.Id)" class="btn btn-block btn-success" style="left:0;">
+                                        <span class="fa fa-file-excel-o" style="color:white;"></span> <span style="color:white;font-weight:bold">Excel</span>
+                                    </a>
+                                </div>   
+                            </div>                           
+                            <div class="panel-heading">
+                                <table class="table table-striped" id="tableModal">
+                                    <thead>
+                                        <tr>
+                                            <th>Sıralama</th>
+                                            <th class="filter">Ekipman İsmi</th>
+                                            <th class="filter">Period</th>
+                                            <th class="filter">Bakım İsmi</th>
+                                            <th class="filter">Bakım Açıklaması</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.ProjectEquipment)
+                                        {
+                                            @if (item.ProjectId == Model.Id)
+                                            {
+                                                @foreach (var equipment in Model.Equipment)
+                                                {
+                                                    @if (item.EquipmentId == equipment.Id)
+                                                    {
+                                                        <tr>
+                                                            <td>@(countEquipment++)</td>
+                                                            <td>@equipment.Name</td>
+                                                            <td>@equipment.Period</td>
+                                                            <td>@equipment.MaintenanceName</td>
+                                                            <td>@equipment.MaintenanceComment</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <br />
+                                <hr />
+                                <h3 class="panel-title" style="text-align:center"><strong>Robot Bilgileri</strong></h3>
+                                <br />
+                                <table class="table table-striped" id="tableModalRobot">
+                                    <thead>
+                                        <tr>
+                                            <th>Sıralama</th>
+                                            <th class="filter">Robot İsmi</th>
+                                            <th class="filter">Robot Açıklaması</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.ProjectRobots)
+                                        {
+                                            @if (item.ProjectId == Model.Id)
+                                            {
+                                                @foreach (var robot in Model.Robots)
+                                                {
+                                                    @if (item.RobotId == robot.Id)
+                                                    {
+                                                        <tr>
+                                                            <td>@(countRobot++)</td>
+                                                            <td>@robot.Name</td>
+                                                            <td>@robot.Note</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    @*$(document).ready(function () {
+          $("#export").click(function () {
+              var url = '@Url.Action("ExportExcel")';
+        window.open(url);
+        });
+      });*@
+    function exportExcel(Id) {
+        $.ajax({
+            url: '/Project/ExportExcel/?Id=' + Id,
+            success: function (data) {
+                window.open('/Project/ExportExcel/?Id=' + Id);
+            }
+        });
+    }
+
+    $('#tableModal').excelTableFilter({
+        columnSelector: '.filter',    // (optional) if present, will only select <th> with specified class
+        sort: true,                         // (optional) default true
+        search: true                    // (optional) default { a_to_z: 'A to Z', z_to_a: 'Z to A', search: 'Search', select_all: 'Select All' }
+    });
+    $('#tableModalRobot').excelTableFilter({
+        columnSelector: '.filter',    // (optional) if present, will only select <th> with specified class
+        sort: true,                         // (optional) default true
+        search: true                    // (optional) default { a_to_z: 'A to Z', z_to_a: 'Z to A', search: 'Search', select_all: 'Select All' }
+    });
+</script>
+
+@*<script>
+        var bLoad = true
+        $(document).ready(function () {
+            getProjectRobots();
+            getProjectEquipments();
+            bLoad = false;
+        });
+        // ===============================
+        // ProjecRobots
+        // ===============================
+        function getProjectRobots() {
+            $.ajax({
+                type: "GET",
+                url: "/ProjectRobot/GetByProjectId?projectId=" + @Model.Project.Id,
+                data: "{}",
+                success: function (data) {
+                    $("#robot").empty();
+                    for (var i = 0; i < data.length; i++) {
+                        var select = document.getElementById("robot");
+                        var start = data[i].indexOf("?");
+                        var end = data[i].length;
+                        robotId = data[i].substring(start + 1, end);
+                        robotName = data[i].substring(0, start);
+                        select.appendChild(new Option(robotName, robotId));
+                    }
+                }
+            });
+        }
+        // ===============================
+        // ProjectEquipments
+        // ===============================
+        function getProjectEquipments() {
+            $.ajax({
+                type: "GET",
+                url: "/ProjectEquipment/GetByProjectId?projectId=" + @Model.Project.Id,
+                data: "{}",
+                success: function (data) {
+                    $("#equipment").empty();
+                    for (var i = 0; i < data.length; i++) {
+                        var select = document.getElementById("equipment");
+                        var start = data[i].indexOf("?");
+                        var end = data[i].length;
+                        equipmentId = data[i].substring(start + 1, end);
+                        equipmentName = data[i].substring(0, start);
+                        select.appendChild(new Option(equipmentName, equipmentId));
+                    }
+                }
+            });
+        }
+        // ===============================
+
+
+
+    </script>*@

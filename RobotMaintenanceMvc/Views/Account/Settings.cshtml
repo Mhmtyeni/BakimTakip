@@ -1,0 +1,254 @@
+﻿@model AppUser
+<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>HESAP AYARLARI</strong></h2>
+            <center>
+                @if (ViewData.ModelState[""] != null && ViewData.ModelState[""].Errors.Count > 0)
+                {
+                    <div class="alert">
+                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                        <span>@Html.ValidationSummary()</span>
+                    </div>
+                }
+            </center>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="col-md-6">
+                                <br />
+                                <br />
+                                <br />
+                                <div class="row">
+                                    <div class=" col-md-12">
+                                        <center>
+                                            <img src="~/assets/img/55.png" />
+                                        </center>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                                <br />
+                                <div class="row">
+                                    <div class=" col-md-12">
+                                        <center>
+                                            <button style="border-radius:10px;" onclick="changePassword()" type="button" class="btn btn-primary btn"><i class="lnr lnr-lock"></i> ŞİFRE DEĞİŞTİR</button>
+                                        </center>
+                                    </div>
+                                </div>
+                                <br />
+                                @if (User.IsInRole("SuperAdmin"))
+                                {
+                                    <div class="row">
+                                        <div class=" col-md-12">
+                                            <center>
+                                                <button style="border-radius:10px;" onclick="resetPassword()" type="button" class="btn btn-warning btn"><i class="lnr lnr-lock"></i> ŞİFRE SIFIRLA</button>
+                                            </center>
+                                        </div>
+                                    </div>
+                                }
+                                <br />
+                                <br />
+                                <br />
+                            </div>
+                            @*AYRIM ================================================================*@
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>HESAP BİLGİLERİ</strong></h3>
+                            </div>
+                            <div class="col-md-6">
+                                <form id="form_id" asp-action="Settings" asp-controller="Account" method="post">
+                                    <label>Sicil</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                        <input class="form-control" placeholder="Sicil" name="UserName" onkeypress="return isNumberKey(event)" type="text" required value="@Model.UserName">
+                                    </div>
+                                    <br />
+                                    <label>Ad</label>
+                                    <input type="text" name="FirstName" class="form-control" placeholder="Ad" required value="@Model.FirstName">
+                                    <br />
+                                    <label>Soyad</label>
+                                    <input type="text" name="LastName" class="form-control" placeholder="Soyad" required value="@Model.LastName">
+                                    <br />
+                                    <label>Email</label>
+                                    <input type="text" class="form-control" name="Email" placeholder="Email" required value="@Model.Email">
+                                    <br />
+                                    <br />
+                                    <center>
+                                        <button id="add" style="border-radius:10px;" type="submit" class="btn btn-success btn btn-block" onclick="validate()">KAYDET</button>
+                                    </center>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+    //========================================================
+    function validate() {
+
+        if (document.forms['form_id'].reportValidity()) {
+            event.preventDefault();
+            var form = document.getElementById("form_id");
+            Swal.fire({
+                title: 'Kaydetmek istediğinize emin misiniz?',
+                text: "Sicil değiştirildiğinde yeniden giriş yapmanız gerekmektedir.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: 'bg-purple-600',
+                cancelButtonColor: 'crimson',
+                cancelButtonText: 'Vazgeç',
+                confirmButtonText: 'Evet, kaydet!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Başarıyla değişmiştir!',
+                        showConfirmButton: false,
+                        timer: 800
+                    }).then(() => {
+                        location.reload();
+                    })
+                    form.submit();
+                }
+            })
+        }
+
+    }
+
+    //===================================================
+    function changePassword() {
+        Swal.fire({
+            title: 'Şifre Değiştirme',
+            html:
+                '<input type="password" id="swal-input1" class="swal2-input" placeholder="Eski Şifre" autocomplete="off">' +
+                '<input type="password" id="swal-input2" class="swal2-input" placeholder="Yeni Şifre" autocomplete="off">',
+            showCancelButton: true,
+            cancelButtonText: 'Vazgeç',
+            confirmButtonText: 'Onayla',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                var OldPassword = $('#swal-input1').val();
+                var NewPassword = $('#swal-input2').val();
+                if (OldPassword != '' && NewPassword != '' && OldPassword.length >= 8 && NewPassword.length >= 8) {
+
+                }
+                else {
+                    Swal.showValidationMessage(
+                        `Şifre alanı boş bırakılamaz! Şifre en az 8 karakterden oluşmalıdır!`
+                    )
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Account/ChangePassword',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'OldPassword': $('#swal-input1').val(),
+                        'NewPassword': $('#swal-input2').val(),
+                    },
+                    success: function (data) {
+                        if (data == true) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Başarıyla değiştirilmiştir!',
+                                showConfirmButton: false,
+                                timer: 800
+                            }).then(() => {
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Eski şifrenizi eksik veya hatalı girdiniz!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                            })
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        })
+    }
+    //==============================================
+    function resetPassword() {
+        var name = '';
+        Swal.fire({
+            title: 'Personel sicilini giriniz!',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Vazgeç',
+            confirmButtonText: 'Sıfırla',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                if (login != '') {
+                    name = login;
+                }
+                else {
+                    Swal.showValidationMessage(
+                        `Sicil alanı boş bırakılamaz!`
+                    )
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Account/ResetPassword',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'UserName': name,
+                    },
+                    success: function (data) {
+                        if (data == true) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Başarıyla sıfırlanmıştır!',
+                                showConfirmButton: false,
+                                timer: 800
+                            }).then(() => {
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Sicili eksik veya hatalı girdiniz!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                            })
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        })
+
+    }
+</script>

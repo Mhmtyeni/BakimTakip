@@ -1,0 +1,245 @@
+﻿@model ProjectDto
+@{
+    Layout = null;
+}
+<div class="modal fade" id="editProjectEquipmentModal" tabindex="-1" role="dialog" aria-labelledby="scrollmodalLabel" aria-hidden="true" style="margin-top: 2%;width:auto; height:auto">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="modal-title" id="scrollmodalLabel">Ekipman Ekle/Çıkar</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                            <div class="col-md-12">
+                                <label>Proje İsmi</label>
+                                <input type="text" disabled id="projectNameEdit" class="form-control" placeholder="Proje İsmi" required value="@Model.Project.Name">
+                                <br />
+                                <label>Ekipmanlar</label>
+                                <div id="equipmentDiv">
+                                    <select name="select" id="projectEquipment" class="form-control">
+                                    </select>
+                                </div>
+                                <br />
+                                <div class="row" id="radioDiv">
+                                    <div class="col-md-2">
+                                        <label class="fancy-radio">
+                                            <input id="radioBtnYes" name="radioBtn" value="yes" type="radio">
+                                            <span><i></i>Ekipman Ekle</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="fancy-radio">
+                                            <input id="radioBtnNo" name="radioBtn" value="no" type="radio">
+                                            <span><i></i>Ekipman Sil</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <br />
+                                <div id="addDiv" style="display:none">
+                                    <form id="form_add">
+                                        <label>Kategori Seç</label>
+                                        <select name="select" id="equipmentCategory" class="form-control" required>
+                                        </select>
+                                        <br />
+                                        <label>Alt Kategori Seç</label>
+                                        <select name="select" id="equipmentSubCategory" class="form-control" required>
+                                        </select>
+                                        <br />
+                                        <label>Ekipman Seç</label>
+                                        <select name="select" id="equipment" class="form-control" required>
+                                        </select>
+                                        <br />
+                                        <button id="add" onclick="postAddData()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">EKLE</button>
+                                    </form>
+                                </div>
+                                <div id="deleteDiv" style="display:none">                 
+                                <button id="add" onclick="postDeleteData()" style="border-radius:10px;" type="button" class="btn btn-danger btn-block">SİL</button>
+                                </div>
+                                <br />
+                            </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" >Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var bLoad = true;
+    var projectEquipmentId;
+    $(document).ready(function () {
+        getProjectEquipments();
+        getEquipmentCategories();
+        $('#equipmentCategory').on("change", function () {
+            getEquipmentSubCategories();
+        })
+        $('#equipmentSubCategory').on("change", function () {
+            getEquipments();
+        })
+        // ===============================
+        // RADIO BUTTON
+        $('#radioBtnNo').on("change", function () {
+            addDiv.style.display = "none";
+            deleteDiv.style.display = "";
+        })
+        $('#radioBtnYes').on("change", function () {
+            addDiv.style.display = "";
+            deleteDiv.style.display = "none";
+        })
+    });
+
+    // ===============================
+    // ProjectEquipments
+    // ===============================
+    function getProjectEquipments() {
+        $.ajax({
+            type: "GET",
+            url: "/ProjectEquipment/GetByProjectIdEquipmentId?Id=" + @Model.Project.Id,
+            data: "{}",
+            success: function (data) {
+                console.log(data);
+                $("#projectEquipment").empty();
+                for (var i = 0; i < data.length; i++) {
+                    var select = document.getElementById("projectEquipment");
+                    var start = data[i].indexOf("?");
+                    var end = data[i].length;
+                    var start2 = data[i].indexOf("|");
+                    var end2 = data[i].length;
+                    equipmentId = data[i].substring(start + 1, end);
+                    equipmentName = data[i].substring(0, start);
+                    projectEquipmentId = data[i].substring(start2 + 1, end);
+                    select.appendChild(new Option(equipmentName, projectEquipmentId));
+                }
+            }
+        });
+    }
+    // ===============================
+    // ===============================
+    function getEquipmentCategories() {
+
+        $.ajax({
+            type: "GET",
+            url: "/EquipmentCategory/GetBySubId?subId=" + 0,
+            data: "{}",
+            success: function (data) {
+                var s = '';
+                for (var i = 0; i < data.equipmentCategories.$values.length; i++) {
+                    s += '<option value="' + data.equipmentCategories.$values[i].id + '">' + data.equipmentCategories.$values[i].name + '</option>';
+                }
+                $("#equipmentCategory").html(s);
+                getEquipmentSubCategories();
+            }
+        });
+    }
+    // ===============================
+    function getEquipmentSubCategories() {
+        $.ajax({
+            type: "GET",
+            url: "/EquipmentCategory/GetBySubId?subId=" + $("#equipmentCategory").val(),
+            success: function (data) {
+                $('#equipmentSubCategory').empty();
+                for (var i = 0; i < data.equipmentCategories.$values.length; i++) {
+                    var select = document.getElementById("equipmentSubCategory");
+                    select.appendChild(new Option(data.equipmentCategories.$values[i].name, data.equipmentCategories.$values[i].id));
+                }
+                getEquipments();
+            }
+        });
+    }
+    // ===============================
+    function getEquipments() {
+        $.ajax({
+            type: "GET",
+            url: "/Equipment/GetByEquimentCategoryId?equimentCategoryId=" + $("#equipmentSubCategory").val(),
+            success: function (data) {
+                $('#equipment').empty();
+                for (var i = 0; i < data.equipments.$values.length; i++) {
+                    var select = document.getElementById("equipment");
+                    select.appendChild(new Option(data.equipments.$values[i].name, data.equipments.$values[i].id));
+                }
+            }
+        });
+    }
+    // ===============================
+    // ===============================
+    // ===============================
+    function postAddData() {
+        if (document.forms['form_add'].reportValidity()) {
+            $.ajax({
+                url: '@Url.Action("Add", "ProjectEquipment")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'ProjectId': @Model.Project.Id,
+                    'EquipmentId': $("#equipment").val(),
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            $("#addDiv").load(getProjectEquipments());
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bu projeye daha önce bu ekipman eklenmiştir.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            $("#addDiv").load(getProjectEquipments());
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+    // ===============================
+    function postDeleteData() {
+        Swal.fire({
+            title: 'Silmek istediğinize emin misiniz?',
+            text: "Silme işlemi geri alınamaz! Bu projeye ait bu ekipman silinecektir!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            cancelButtonText: 'Vazgeç',
+            confirmButtonText: 'Evet, sil!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: "/ProjectEquipment/Delete?Id=" + $("#projectEquipment").val(),
+                    success: function (result) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla silinmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            $("#addDiv").load(getProjectEquipments());
+                        })
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        })
+    }
+</script>

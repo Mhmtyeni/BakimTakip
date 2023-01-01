@@ -1,0 +1,199 @@
+﻿@model AppUserListDto
+@{
+    string[] userId = new string[Model.AppUsers.Count];
+    int i = 0;
+    DateTime dateTime = DateTime.Now;
+    string year, mounth, day;
+    year = dateTime.Year.ToString();
+    mounth = dateTime.Month.ToString();
+    day = dateTime.Day.ToString();
+    if (day.Length == 1)
+    {
+        day = "0" + day;
+    }
+    if (mounth.Length == 1)
+    {
+        mounth = "0" + mounth;
+    }
+}
+<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>ARIZA EKLE</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Arıza Bilgileri</strong></h3>
+                            </div>
+                            <form id="form_id">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-md-3">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <br />
+                                            <label>Proje Seç</label>
+                                            <select name="select" id="project" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <label>Arızayla İlgili Madde</label>
+                                            <input type="text" id="fault" class="form-control" placeholder="Arıza Madde İsmi" required>
+                                            <br />
+                                            <label>Arıza Açıklaması</label>
+                                            <input type="text" id="faultComment" class="form-control" placeholder="Arıza Açıklaması Gir" required>
+                                            <br />
+                                            <label>Sorumlu Seç</label>
+                                            <br />
+                                            <div id="divCheckBoxs">
+                                                @foreach (var item in Model.AppUsers)
+                                                {
+                                                    
+                                                        userId[i] = "CheckBox" + item.Id;
+                                                        //equipmentId = Convert.ToInt32(item.Note);
+                                                    <div class="col-md-4" id="ccDeneme">
+                                                        <label style="padding-bottom:5px" class="fancy-checkbox">
+                                                            <input name="Deneme" type="checkbox" id="@userId[i]" value="@item.FirstName @item.LastName">
+                                                            <span>@item.FirstName @item.LastName</span>
+                                                        </label>
+                                                    </div>
+                                                        i++;
+                                                }
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    @*<br />
+                                                        <label>Termin 1</label>
+                                                        <br />
+                                                        <input style="width:150px" type="date" id="maintenanceDate" name="maintenanceDate" value="@DateTime.Now" min="2018-01-01" max="2025-12-31">
+                                                        <br />
+                                                        <br />*@
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label>Termin Seç</label>
+                                                    <br />
+                                                    <input style="width:200px" type="date" id="maintenanceDate" name="maintenanceDate" value="@year-@mounth-@day" min="@year-@mounth-@day" max="2025-12-31" required>
+                                                    <br />
+                                                    <br />
+                                                </div>
+                                                <div class="col-md-4">
+                                                    @*<br />
+                                                        <label>Termin 3</label>
+                                                        <br />
+                                                        <input style="width:150px" type="date" id="maintenanceDate" name="maintenanceDate" value="@DateTime.Now" min="2018-01-01" max="2025-12-31">
+                                                        <br />
+                                                        <br />*@
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <br />
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                </div>
+                                <div class="col-md-6">
+                                    <button id="add" onclick="postData()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">EKLE</button>
+                                </div>
+                                <div class="col-md-4">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        getProjects();
+    });
+    var liste = new Array();
+    var users = "";
+    $('#divCheckBoxs').on("change", function () {
+        var Secilenler = "";
+        $('#divCheckBoxs :checked').each(function () {
+            Secilenler += $(this).val() + ",";
+        });
+        liste = Secilenler.split(",");
+    })
+
+    // ===============================
+    // Project
+    // ===============================
+    function getProjects() {
+        $.ajax({
+            type: "GET",
+            url: "/Project/GetAll",
+            data: "{}",
+            success: function (data) {
+                var s = '';
+                for (var i = 0; i < data.projects.$values.length; i++) {
+                    s += '<option value="' + data.projects.$values[i].id + '">' + data.projects.$values[i].name + '</option>';
+                }
+                $("#project").html(s);
+            }
+        });
+    }
+    // ===============================
+    // ===============================
+    function postData() {
+        if (document.forms['form_id'].reportValidity()) {
+            document.getElementById("add").disabled = true;
+            for (var i = 0; i < liste.length; i++) {
+                users += liste[i]+",";
+            }
+            $.ajax({
+                url: '@Url.Action("Add", "FaultReport")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'ProjectId': $("#project").val(),
+                    'AppUserId': 2,
+                    'Fault': $("#fault").val(),
+                    'Comment': $("#faultComment").val(),
+                    'Deadline1': $("#maintenanceDate").val(),
+                    'Deadline2': $("#maintenanceDate").val(),
+                    'Deadline3': $("#maintenanceDate").val(),
+                    'Completed': false,
+                    'Note': users
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bir hata oluştur!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+
+
+</script>

@@ -1,0 +1,16 @@
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\bin\Debug\netcoreapp3.1\BusinessLayer.deps.json
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\bin\Debug\netcoreapp3.1\BusinessLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\bin\Debug\netcoreapp3.1\BusinessLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\bin\Debug\netcoreapp3.1\DataAccsessLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\bin\Debug\netcoreapp3.1\EntityLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\bin\Debug\netcoreapp3.1\SharedLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\bin\Debug\netcoreapp3.1\DataAccsessLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\bin\Debug\netcoreapp3.1\EntityLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\bin\Debug\netcoreapp3.1\SharedLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\obj\Debug\netcoreapp3.1\BusinessLayer.csprojAssemblyReference.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\obj\Debug\netcoreapp3.1\BusinessLayer.AssemblyInfoInputs.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\obj\Debug\netcoreapp3.1\BusinessLayer.AssemblyInfo.cs
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\obj\Debug\netcoreapp3.1\BusinessLayer.csproj.CoreCompileInputs.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\obj\Debug\netcoreapp3.1\BusinessLayer.csproj.CopyComplete
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\obj\Debug\netcoreapp3.1\BusinessLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\BusinessLayer\obj\Debug\netcoreapp3.1\BusinessLayer.pdb

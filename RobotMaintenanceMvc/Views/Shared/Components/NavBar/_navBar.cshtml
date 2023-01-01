@@ -1,0 +1,65 @@
+﻿@model NavBarViewModel
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div style="height:81px;" class="brand">
+        <a href="/Home/Index"><img style="height:82px;width:301px;margin-top:-27px;margin-left:-40px" src="~/assets/img/aa.png" alt="Logo" class="img-responsive logo"></a>
+    </div>
+    <div class="container-fluid">
+        <div style="margin-left:-60px" class="navbar-btn">
+            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
+        </div>        
+        <form class="navbar-form navbar-left" asp-action="Search" asp-controller="Project" method="POST">
+            <div class="input-group">
+                <input type="text" name="searchKey" id="searchKey" class="form-control" placeholder="Arama..." required>
+                <span class="input-group-btn"><button onclick="projectSearch()" type="button" class="btn btn-primary">Projelerde Ara</button></span>
+                <span class="input-group-btn"><button onclick="robotSearch()" type="button" class="btn btn-success">Robotlarda Ara</button></span>
+                <span class="input-group-btn"><button onclick="equipmentSearch()" type="button" class="btn btn-warning">Ekipmanlarda Ara</button></span>
+            </div>
+        </form>
+        <div id="navbar-menu">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                    {
+                        @await Component.InvokeAsync("Notification")
+                    }
+                </li>
+                <li class="dropdown">
+                      @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                      {
+                         @await Component.InvokeAsync("NotificationRobot")
+                      }
+                </li>
+                    <li class="dropdown">
+                    @if (User.IsInRole("User") || User.IsInRole("Engineer") || User.IsInRole("Chef") || User.IsInRole("SuperAdmin"))
+                    {
+                        @await Component.InvokeAsync("NotificationUser")
+                    }
+                </li>
+                    <li class="dropdown">
+                        @if (User.IsInRole("User") || User.IsInRole("Engineer") || User.IsInRole("Chef") || User.IsInRole("SuperAdmin"))
+                        {
+                    @await Component.InvokeAsync("NotificationRobotUser")}
+                    </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="~/assets/img/555.png" class="img-circle" alt="Avatar"> <span style="text-transform:uppercase">@Model.AppUser.FirstName @Model.AppUser.LastName</span> <i class="icon-submenu lnr lnr-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Account/Settings"><i class="lnr lnr-cog"></i> <span>Hesap Ayarları</span></a></li>
+                        <li><a href="/Account/Logout"><i class="lnr lnr-exit"></i> <span>Çıkış Yap</span></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<script>
+    function projectSearch() {
+        window.location.href = '/Project/Search/?searchKey=' + $("#searchKey").val();
+    }
+    function robotSearch() {
+        window.location.href = '/Robot/Search/?searchKey=' + $("#searchKey").val();
+    }
+    function equipmentSearch() {
+        window.location.href = '/Equipment/Search/?searchKey=' + $("#searchKey").val();
+    }
+</script>

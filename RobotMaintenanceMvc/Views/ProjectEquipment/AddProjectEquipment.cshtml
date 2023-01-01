@@ -1,0 +1,367 @@
+﻿<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>PROJEYE EKİPMAN EKLE</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Proje ve Ekipman Bilgileri</strong></h3>
+                            </div>
+                            <form id="form_id">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <label>Proje Seç</label>
+                                            <select name="select" id="project" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <label>Kategori Seç</label>
+                                            <div id="categoryDiv">
+                                                <select name="select" id="equipmentCategory" class="form-control" required>
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <label>Alt Kategori Seç</label>
+                                            <div id="subCategoryDiv">
+                                                <select name="select" id="equipmentSubCategory" class="form-control">
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <label>Ekipman Seç</label>
+                                            <div id="equipmentDiv">
+                                                <select name="select" id="equipment" class="form-control" required>
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <br />
+                                        </div>
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <div class="col-md-6">
+                                            <button style="border-radius:10px;width:156.2px;" type="button" onclick="addEquipmentCategory()" class="btn btn-default"><i class="fa fa-plus-square"></i> Kategori Ekle </button>
+                                            <br />
+                                            <br />
+                                            <br />
+                                            <button style="margin-top:5px;border-radius:10px;" onclick="addEquipmentSubCategory()" type="button" class="btn btn-default"><i class="fa fa-plus-square"></i> Alt Kategori Ekle </button>
+                                            <br />
+                                            <br />
+                                            <br />
+                                            <button style="margin-top:5px;border-radius:10px;width:156.2px;" onclick="addEquipment()" type="button" class="btn btn-default"><i class="fa fa-plus-square"></i> Ekipman Ekle </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                </div>
+                                <div class="col-md-4">
+                                    <button id="add" onclick="postData()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">EKLE</button>
+                                </div>
+                                <div class="col-md-4">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+    $(document).ready(function () {
+        getProjects();
+        getEquipmentCategories();
+
+        $('#equipmentCategory').on("change", function () {
+            getEquipmentSubCategories();
+        })
+        $('#equipmentSubCategory').on("change", function () {
+            getEquipments();
+        })
+    });
+
+    // ===============================
+    // Project
+    // ===============================
+    function getProjects() {
+        $.ajax({
+            type: "GET",
+            url: "/Project/GetAll",
+            data: "{}",
+            success: function (data) {
+                var s = '';
+                for (var i = 0; i < data.projects.$values.length; i++) {
+                    s += '<option value="' + data.projects.$values[i].id + '">' + data.projects.$values[i].name + '</option>';
+                }
+                $("#project").html(s);
+            }
+        });
+    }
+
+    // ===============================
+    // EquipmentCategory
+    // ===============================
+    function addEquipmentCategory() {
+        var name = '';
+        Swal.fire({
+            title: 'Kategori adını giriniz!',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Vazgeç',
+            confirmButtonText: 'Ekle',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                if (login != '') {
+                    name = login;
+                }
+                else {
+                    Swal.showValidationMessage(
+                        `İsim alanı boş bırakılamaz!`
+                    )
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/EquipmentCategory/Add/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': name,
+                        'SubId': 0,
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            $("#categoryDiv").load(getEquipmentCategories());
+                        })
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        })
+    }
+    // ===============================
+    function getEquipmentCategories() {
+
+        $.ajax({
+            type: "GET",
+            url: "/EquipmentCategory/GetBySubId?subId=" + 0,
+            data: "{}",
+            success: function (data) {
+                var s = '';
+                for (var i = 0; i < data.equipmentCategories.$values.length; i++) {
+                    s += '<option value="' + data.equipmentCategories.$values[i].id + '">' + data.equipmentCategories.$values[i].name + '</option>';
+                }
+                $("#equipmentCategory").html(s);
+                getEquipmentSubCategories();
+            }
+        });
+    }
+
+    // ===============================
+    // EquipmentSubCategory
+    // ===============================
+    function addEquipmentSubCategory() {
+        var name = '';
+        Swal.fire({
+            title: 'Alt Kategori adını giriniz!',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Vazgeç',
+            confirmButtonText: 'Ekle',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                if (login != '') {
+                    name = login;
+                }
+                else {
+                    Swal.showValidationMessage(
+                        `İsim alanı boş bırakılamaz!`
+                    )
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/EquipmentCategory/Add/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': name,
+                        'SubId': $("#equipmentCategory").val(),
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            $("#subCategoryDiv").load(getEquipmentSubCategories());
+                        })
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        })
+    }
+    // ===============================
+    function getEquipmentSubCategories() {
+        $.ajax({
+            type: "GET",
+            url: "/EquipmentCategory/GetBySubId?subId=" + $("#equipmentCategory").val(),
+            success: function (data) {
+                $('#equipmentSubCategory').empty();
+                for (var i = 0; i < data.equipmentCategories.$values.length; i++) {
+                    var select = document.getElementById("equipmentSubCategory");
+                    select.appendChild(new Option(data.equipmentCategories.$values[i].name, data.equipmentCategories.$values[i].id));
+                }
+                getEquipments();
+            }
+        });
+    }
+    // ===============================
+    // Equipment
+    // ===============================
+    function getEquipments() {
+        $.ajax({
+            type: "GET",
+            url: "/Equipment/GetByEquimentCategoryId?equimentCategoryId=" + $("#equipmentSubCategory").val(),
+            success: function (data) {
+                $('#equipment').empty();
+                for (var i = 0; i < data.equipments.$values.length; i++) {
+                    var select = document.getElementById("equipment");
+                    select.appendChild(new Option(data.equipments.$values[i].name, data.equipments.$values[i].id));
+                }
+            }
+        });
+    }
+    // ===============================
+    function addEquipment() {
+        Swal.fire({
+            title: 'Ekipman Ekleme',
+            html:
+                '<input type="text" style="width:230px;" id="swal-input1" class="swal2-input" placeholder="Ekipman İsmi" autocomplete="off">' +
+                '<input type="text" style="width:230px;" id="swal-input2" class="swal2-input" onkeypress="return isNumberKey(event)" placeholder="Bakım Periodu(Gün olarak giriniz.)" autocomplete="off">' +
+                '<input type="text" style="width:230px;" id="swal-input3" class="swal2-input" placeholder="Bakım Adı" autocomplete="off">' +
+                '<input type="text" style="width:230px;" id="swal-input4" class="swal2-input" placeholder="Bakım Açıklaması" autocomplete="off">' ,
+            showCancelButton: true,
+            cancelButtonText: 'Vazgeç',
+            confirmButtonText: 'Onayla',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                var Name = $('#swal-input1').val();
+                var Period = $('#swal-input2').val();
+                var MaintenanceName = $('#swal-input3').val();
+                var MaintenanceComment = $('#swal-input4').val();
+                if (Name != '' && Period != '' && MaintenanceName != '' && MaintenanceComment != '' ) {
+
+                }
+                else {
+                    Swal.showValidationMessage(
+                        `Tüm alanları doğru ve eksiksiz bir şekilde doldurduğunuzdan emin olunuz!`
+                    )
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Equipment/Add/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': $('#swal-input1').val(),                        
+                        'EquipmentCategoryId': $("#equipmentSubCategory").val(),
+                        'Period': $('#swal-input2').val(),
+                        'MaintenanceName': $('#swal-input3').val(),
+                        'MaintenanceComment': $('#swal-input4').val(),
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            $("#equipmentDiv").load(getEquipments());
+                        })
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        })
+    }
+    // ===============================
+    function postData() {
+        if (document.forms['form_id'].reportValidity()) {
+            document.getElementById("add").disabled = true;
+            $.ajax({
+                url: '@Url.Action("Add", "ProjectEquipment")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'ProjectId': $("#project").val(),
+                    'EquipmentId': $("#equipment").val(),
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bu projeye daha önce bu ekipman eklenmiştir.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+
+
+</script>

@@ -1,0 +1,52 @@
+﻿@model RobotToBeMaintainedUserListDto
+@{    
+    int count = 0;
+    int notificationCount = 0;
+    foreach (var item in Model.RobotToBeMaintainedUsers)
+    {
+        if (!item.DoneOrNotDone || item.MaintenanceDate.AddDays(item.RobotMaintenance.Maintenance.Period) <= DateTime.Now)
+            count++;
+    }
+ }
+<div id="navbar-menu">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a style="background-color:transparent" href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
+                        <img style="width:30px;height:30px;" src="~/img/roboticon.png" />
+                        @if (count > 0)
+                        {
+                    <span style="margin-right:-4px" class="badge bg-danger">@count</span>}
+                    </a>
+                    <ul class="dropdown-menu notifications">
+                        <li><a style="font-weight:bold">ROBOT BAKIM BİLDİRİMLERİ</a></li>
+                        @foreach (var item in Model.RobotToBeMaintainedUsers)
+                        {
+                            if (notificationCount < 6)
+                            {
+                                if (!item.DoneOrNotDone || item.MaintenanceDate.AddDays(item.RobotMaintenance.Maintenance.Period) <= DateTime.Now)
+                                {
+                    <li>
+                        <a href="/RobotToBeMaintainedUser/RobotMaintenanceUser" class="notification-item">
+                            <span class="dot bg-danger"></span>
+                            <span style="font-weight:bold">@item.ProjectRobot.Project.Name</span>
+                            <span>projesindeki</span>  <span style="font-weight:bold">@item.RobotMaintenance.Robot.Name</span>
+                            <span>adlı robotun </span>
+                            <span style="font-weight:bold">@item.RobotMaintenance.Maintenance.Name</span>
+                            <span>bakımı gelmiştir!</span>
+                        </a>
+                    </li>notificationCount++;
+                                        }
+                                    }
+                                }
+                        @if (count == 0)
+                        {
+                            <li><a href="#" class="notification-item"><span class="dot bg-success"></span>Robot bakımı bulunmamaktadır.</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/RobotToBeMaintainedUser/RobotMaintenanceUser" class="more">Tüm bildirimler</a></li>
+                        }                        
+                    </ul>
+                </li>
+            </ul>
+        </div>

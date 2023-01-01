@@ -1,0 +1,155 @@
+﻿@model EquipmentDto
+@{
+    Layout = null;
+}
+<div class="modal fade" id="editEquipmentModal" tabindex="-1" role="dialog" aria-labelledby="scrollmodalLabel" aria-hidden="true" style="margin-top: 2%;width:auto; height:auto">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="modal-title" id="scrollmodalLabel">Ekipman Düzenleme</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="updateForm">
+                            <div class="col-md-12">
+                                <label>Ekipman İsmi</label>
+                                <input type="text" id="equipmentNameEdit" class="form-control" placeholder="Proje İsmi" required value="@Model.Equipment.Name">
+                                <br />
+                                <label>Kategori Seç</label>
+                                <div id="categoryDiv">
+                                    <select name="select" id="equipmentCategory" class="form-control" required>
+                                    </select>
+                                </div>
+                                <br />
+                                <label>Alt Kategori Seç</label>
+                                <div id="subCategoryDiv">
+                                    <select name="select" id="equipmentSubCategory" class="form-control" required>
+                                    </select>
+                                </div>
+                                <br />
+                                <label>Bakım Periodu <span style="color:crimson;">(Gün olarak giriniz)</span></label>
+                                <input type="text" id="maintenancePeriodEdit" onkeypress="return isNumberKey(event)" class="form-control" placeholder="Bakım Periodu" required value="@Model.Equipment.Period">
+                                <br />
+                                <label>Bakım İsmi</label>
+                                <input type="text" id="maintenanceNameEdit" class="form-control" placeholder="Bakım İsmi" required value="@Model.Equipment.MaintenanceName">
+                                <br />
+                                <label>Bakım Açıklaması</label>
+                                <textarea style="height:130px; max-height:150px;max-width:840px" type="text" id="maintenanceCommentEdit" class="form-control" placeholder="Açıklama" required>@Model.Equipment.MaintenanceComment</textarea>
+                                <br />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button id="updateBtn" onclick="updateProject()" class="btn btn-success">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+    var bLoad = true
+    $(document).ready(function () {
+        getEquipmentCategories(true);
+        //getProjectRobots();
+        //getProjectEquipments();
+        bLoad = false;
+        $('#equipmentCategory').on("change", function () {
+            getEquipmentSubCategories();
+        })
+    });
+    // ===============================
+    // Factory
+    // ===============================
+    function getEquipmentCategories(bLoad) {
+        $.ajax({
+            type: "GET",
+            url: "/EquipmentCategory/GetBySubId?subId=" + 0,
+            data: "{}",
+            success: function (data) {
+                for (var i = 0; i < data.equipmentCategories.$values.length; i++) {
+                    var select = document.getElementById("equipmentCategory");
+                    if (@Model.Equipment.EquipmentCategory.Id == data.equipmentCategories.$values[i].id && bLoad)
+                         select.appendChild(new Option(data.equipmentCategories.$values[i].name, data.equipmentCategories.$values[i].id, true, true));
+                    else
+                         select.appendChild(new Option(data.equipmentCategories.$values[i].name, data.equipmentCategories.$values[i].id));
+                }
+                getEquipmentSubCategories(bLoad);
+            }
+        });
+    }
+    // ===============================
+    // FactoryDepartment
+    // ===============================
+    function getEquipmentSubCategories(bLoad) {
+        $.ajax({
+            type: "GET",
+            url: "/EquipmentCategory/GetBySubId?subId=" + $("#equipmentCategory").val(),
+            success: function (data) {
+                $('#equipmentSubCategory').empty();
+                for (var i = 0; i < data.equipmentCategories.$values.length; i++) {
+                    var select = document.getElementById("equipmentSubCategory");
+                    if (@Model.Equipment.EquipmentCategoryId == data.equipmentCategories.$values[i].id && bLoad)
+                        select.appendChild(new Option(data.equipmentCategories.$values[i].name, data.equipmentCategories.$values[i].id, true, true));
+                    else
+                        select.appendChild(new Option(data.equipmentCategories.$values[i].name, data.equipmentCategories.$values[i].id));
+                }
+            }
+        });
+    }
+    // ===============================   
+    // ===============================
+    // ===============================
+    function updateProject() {
+        if (document.forms['updateForm'].reportValidity()) {
+            document.getElementById("updateBtn").disabled = true;
+         $.ajax({
+                 url: '/Equipment/Edit/',
+                 type: 'POST',
+                 dataType :'json',
+                 data: {
+                     'Id' : @Model.Equipment.Id,
+                     'Name': $("#equipmentNameEdit").val(),
+                     'EquipmentCategoryId': $("#equipmentSubCategory").val(),
+                     'Period': $("#maintenancePeriodEdit").val(),
+                     'MaintenanceName': $("#maintenanceNameEdit").val(),
+                     'MaintenanceComment': $("#maintenanceCommentEdit").val(),
+                     'CreatedDate': '@Model.Equipment.CreatedDate',
+                     'CreatedByName': '@Model.Equipment.CreatedByName',
+                },
+             success: function (data) {
+                 Swal.fire({
+                     position: 'center',
+                     icon: 'success',
+                     title: 'Başarıyla kaydedilmiştir!',
+                     showConfirmButton: false,
+                     timer: 800
+                 }).then(() => {
+                     location.reload();
+                 })
+
+                },
+                error: function (data) {
+                    document.getElementById("updateBtn").disabled = false;
+                }
+            });
+        }
+
+    };
+    // =====================================================
+
+
+
+</script>

@@ -1,0 +1,222 @@
+﻿@*@model EquipmentDto*@
+<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>ROBOT BAKIMI EKLE/DÜZENLE</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Bakım Bilgileri</strong></h3>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    @*=====================================BAKIM EKLE======================================================*@
+                                    <form id="form_add">
+                                        <div class="col-md-5">
+                                            <h3 class="panel-title" style="text-align:center"><strong>Bakım Ekle</strong></h3>
+                                            <br />
+                                            <label>Bakım İsmi</label>
+                                            <input type="text" id="maintenanceNameAdd" class="form-control" placeholder="Bakım İsmi" required>
+                                            <br />
+                                            <label>Bakım Periodu <span style="color:crimson;">(Gün olarak giriniz)</span></label>
+                                            <input type="text" id="maintenancePeriodAdd" onkeypress="return isNumberKey(event)" class="form-control" placeholder="Bakım Periodu" required>
+                                            <br />
+                                            <label>Bakım Açıklaması</label>
+                                            <textarea style="height:100px" type="text" id="maintenanceCommentAdd" class="form-control" placeholder="Açıklama" required></textarea>
+                                            <br />
+                                            <button id="add" onclick="postDataAdd()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">EKLE</button>
+                                            <br />
+                                            <br />
+                                        </div>
+                                    </form>
+                                    @*=====================================CENTER DIV======================================================*@
+                                    <div class="col-md-2">
+                                    </div>
+                                    @*=====================================BAKIM DÜZENLE======================================================*@
+
+                                    <form id="form_edit" asp-action="Edit" asp-controller="Equipment" method="post">
+                                        <div class="col-md-5">
+                                            <h3 class="panel-title" style="text-align:center"><strong>Bakım Düzenle</strong></h3>
+                                            <br />
+                                            <label>Bakım Seç</label>
+                                            <div id="maintenanceDiv">
+                                                <select name="select" id="maintenance" class="form-control" required>
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <label>Bakım İsmi</label>
+                                            <input type="text" id="maintenanceNameEdit" class="form-control" placeholder="Bakım İsmi" required>
+                                            <br />
+                                            <label>Bakım Periodu <span style="color:crimson;">(Gün olarak giriniz)</span></label>
+                                            <input type="text" id="maintenancePeriodEdit" onkeypress="return isNumberKey(event)" class="form-control" placeholder="Bakım Periodu" required value="">
+                                            <br />
+                                            <label>Bakım Açıklaması</label>
+                                            <textarea style="height:100px" type="text" id="maintenanceCommentEdit" class="form-control" placeholder="Açıklama" required></textarea>
+                                            <br />
+                                            <button id="edit" onclick="postDataEdit()" style="border-radius:10px;" type="submit" class="btn btn-primary btn-block">KAYDET</button>
+                                            <br />
+                                            <br />
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+    var maintenanceId, createdDate, createName;
+
+    $(document).ready(function () {
+        getMaintenances();
+    });
+
+    $('#maintenance').on("change", function () {
+        getMaintenanceInfo();
+    })
+
+    // ===============================
+    // Maintenance
+    // ===============================
+    // ===============================
+    function getMaintenances() {
+
+            $.ajax({
+                type: "GET",
+                url: "/Maintenance/GetAll",
+                data: "{}",
+                success: function (data) {
+                    var s = '';
+                    for (var i = 0; i < data.maintenances.$values.length; i++) {
+                        s += '<option value="' + data.maintenances.$values[i].id + '">' + data.maintenances.$values[i].name + '</option>';
+                    }
+                    $("#maintenance").html(s);
+                    getMaintenanceInfo();
+                }
+            });
+    }
+    // ===============================
+
+
+    // ===============================
+    function getMaintenanceInfo() {
+        if ($("#maintenance").val() != null) {
+        $.ajax({
+            type: "GET",
+            url: "/Maintenance/GetById?maintenanceId=" + $("#maintenance").val(),
+            success: function (data) {
+                $('#maintenancePeriodEdit').val(data.maintenance.period);
+                $('#maintenanceNameEdit').val(data.maintenance.name);
+                $('#maintenanceCommentEdit').val(data.maintenance.maintenanceComment);
+                maintenanceId = data.maintenance.id;
+                createdDate = data.maintenance.createdDate;
+                createdName = data.maintenance.createName;
+            }
+        });
+    }
+    }
+
+    function postDataAdd() {
+        if (document.forms['form_add'].reportValidity()) {
+            document.getElementById("add").disabled = true;
+            $.ajax({
+                url: '@Url.Action("Add", "Maintenance")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'Name': $("#maintenanceNameAdd").val(),
+                    'Period': $("#maintenancePeriodAdd").val(),
+                    'MaintenanceComment': $("#maintenanceCommentAdd").val(),
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bu bakım daha önce eklenmiştir.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+
+    function postDataEdit() {
+         if (document.forms['form_edit'].reportValidity()) {
+             document.getElementById("edit").disabled = true;
+            $.ajax({
+                url: '/Maintenance/Edit/',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'Name': $("#maintenanceNameEdit").val(),
+                    'Period': $("#maintenancePeriodEdit").val(),
+                    'MaintenanceComment': $("#maintenanceCommentEdit").val(),
+                    'Id': maintenanceId,
+                    'CreatedDate': createdDate,
+                    'CreatedName': createdName,
+
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla güncellenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Aynı isimde bir bakım mevcut!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+
+
+
+</script>

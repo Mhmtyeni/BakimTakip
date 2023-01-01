@@ -1,0 +1,107 @@
+﻿@model AppUserListDto
+@{
+    string[] userId = new string[Model.AppUsers.Count];
+    int i = 0;
+    int id = 0;
+    foreach (var item in Model.AppUsers)
+    {
+        if (item.Id==2)
+        {
+            id = Convert.ToInt32(item.PhoneNumber);
+        }
+    }
+}
+<div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="scrollmodalLabel" aria-hidden="true" style="margin-top: 2%;width:auto; height:auto">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="modal-title" id="scrollmodalLabel">Sorumlu Düzenleme</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="updateForm">
+                            <div class="col-md-12">
+                                <label>Sorumlu Seç</label>
+                                <br />
+                                <div id="divCheckBoxs">
+                                    @foreach (var item in Model.AppUsers)
+                                    {                                        
+                                            userId[i] = "CheckBox" + item.Id;
+                                            //equipmentId = Convert.ToInt32(item.Note);
+                                        <div class="col-md-4" id="ccDeneme">
+                                            <label style="padding-bottom:5px" class="fancy-checkbox">
+                                                <input name="Deneme" type="checkbox" id="@userId[i]" value="@item.FirstName @item.LastName">
+                                                <span>@item.FirstName @item.LastName</span>
+                                            </label>
+                                        </div>
+                                            i++;                                        
+                                    }
+                                </div>
+                                <br />
+                                <br />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button id="updateBtn" onclick="updateFaultReport()" class="btn btn-success">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var liste = new Array();
+    var users = "";
+    $('#divCheckBoxs').on("change", function () {
+        var Secilenler = "";
+        $('#divCheckBoxs :checked').each(function () {
+            Secilenler += $(this).val() + ",";
+        });
+        liste = Secilenler.split(",");
+    })
+    // ===============================
+    // ===============================
+    function updateFaultReport() {
+        if (document.forms['updateForm'].reportValidity()) {
+            document.getElementById("updateBtn").disabled = true;
+            for (var i = 0; i < liste.length; i++) {
+                users += liste[i] + ",";
+            }
+            $.ajax({
+                url: '/FaultReport/Edit/',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'Id':@id,
+                    'Note': users,
+                },
+                success: function (data) {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Başarıyla kaydedilmiştir!',
+                        showConfirmButton: false,
+                        timer: 800
+                    }).then(() => {
+                        location.reload();
+                    })
+
+                },
+                error: function (data) {
+                    document.getElementById("updateBtn").disabled = false;
+                }
+            });
+        }
+
+    };
+        // =====================================================
+
+
+
+</script>

@@ -1,0 +1,132 @@
+﻿<div id="sidebar-nav" class="sidebar">
+    <div class="sidebar-scroll">
+        <nav>
+            <div style="padding-top:7px"></div>
+            <ul class="nav">
+                <li><a href="/Home/Index" class=""><i class="lnr lnr-home"></i> <span>Anasayfa</span></a></li>
+                 @if (User.IsInRole("Admin") || User.IsInRole("Engineer") || User.IsInRole("SuperAdmin"))
+                 {
+                <li><a href="/Project/AddProject" class=""><i class="lnr lnr-pencil"></i> <span>Proje Ekle</span></a></li>
+                 }
+                @*<li><a href="#" class=""><i class="lnr lnr-chart-bars"></i> <span>Charts</span></a></li>*@
+                <li> 
+                    @if (User.IsInRole("Admin") || User.IsInRole("Engineer") || User.IsInRole("SuperAdmin"))
+                    {
+                    <a href="#subPages" data-toggle="collapse" class="collapsed"><img style="margin-left:-3px" src="~/img/microsoft-project.png" /><span style="margin-left:13px">Projeler</span> <i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    }
+                    <div id="subPages" class="collapse ">
+                        <ul class="nav">
+                             @if (User.IsInRole("Admin") || User.IsInRole("Engineer") || User.IsInRole("SuperAdmin"))
+                             {
+                            <li><a href="/ProjectEquipment/AddProjectEquipment" class="">Projeye Ekipman Ekle</a></li>
+                            <li><a href="/ProjectRobot/AddProjectRobot" class="">Projeye Robot Ekle</a></li>
+                             }
+                             @if (User.IsInRole("SuperAdmin"))
+                             {
+                            <li><a href="/ProjectResponsible/AddProjectResponsible" class="">Projeye Sorumlu Ekle</a></li>
+                             }
+                              @if (User.IsInRole("Admin") || User.IsInRole("Engineer") || User.IsInRole("SuperAdmin"))
+                              {
+                            <li><a href="/EquipmentMaintenanceUser/AddEquipmentMaintenanceUser" class="">Projedeki Ekipmanın Bakımını Düzenle</a></li>
+                            <li><a href="/RobotToBeMaintained/AddRobotToBeMaintained" class="">Projedeki Robotun Bakımını Düzenle</a></li>
+                              }
+                        </ul>
+                    </div>
+                </li>         
+                @if (User.IsInRole("Admin") || User.IsInRole("Engineer") || User.IsInRole("SuperAdmin"))
+                {
+                <li>
+                    <a href="#subPages2" data-toggle="collapse" class="collapsed"><img style="margin-left:-5px" src="~/img/robot.png" /> <span style="margin-left:3px">Robotlar</span> <i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <div id="subPages2" class="collapse ">
+                        <ul class="nav">
+                            <li><a href="/Robot/AddRobot" class=""><span>Robot Ekle/Düzenle</span></a></li>
+                            <li><a style="font-size:14.5px" href="/Maintenance/AddMaintenance" class="">Robot Bakımı Ekle/Düzenle</a></li>
+                            <li><a style="font-size:14.2px" href="/RobotMaintenance/AddRobotMaintenance" class="">Robota Bakım Ekle/Düzenle</a></li>
+                        </ul>
+                    </div>
+                </li>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                {
+                <li>
+                    <a href="#subPages3" data-toggle="collapse" class="collapsed"><img style="margin-left:0px" src="~/img/maintenance.png" /> <span style="margin-left:7px">Bakım Onayları</span> <i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <div id="subPages3" class="collapse ">
+                        <ul class="nav">
+                            <li><a href="/EquipmentMaintenance/EquipmentMaintenance" class=""><span>Ekipman Bakım Onayları</span></a></li>
+                            <li><a href="/RobotToBeMaintained/RobotMaintenance" style="font-size:14.2px" class="">Robot Bakım Onayları</a></li>
+                        </ul>
+                    </div>
+                </li>
+                }
+                 @if (User.IsInRole("User") || User.IsInRole("Chef") || User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                 {
+                <li>
+                    <a href="#subPages5" data-toggle="collapse" class="collapsed"><img style="margin-left:0px" src="~/img/maintenance.png" /> <span style="margin-left:7px">Bakımlar</span> <i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <div id="subPages5" class="collapse ">
+                        <ul class="nav">
+                            <li><a href="/EquipmentMaintenanceUser/EquipmentMaintenanceUser" class=""><span>Ekipman Bakımları</span></a></li>
+                            <li><a href="/RobotToBeMaintainedUser/RobotMaintenanceUser" style="font-size:14.2px" class="">Robot Bakımları</a></li>
+                        </ul>
+                    </div>
+                </li>
+                }
+                   @if (User.IsInRole("User") || User.IsInRole("Chef") || User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                 {
+                <li>
+                    <a href="#subPages6" data-toggle="collapse" class="collapsed"><img style="margin-left:-6px" src="~/img/administrative-tools.png" /> <span style="margin-left:3px">Arıza Takip</span> <i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <div id="subPages6" class="collapse ">
+                        <ul class="nav">
+                             @if (User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                             {
+                            <li><a href="/FaultReport/AddFaultReport" class=""><span>Arıza Ekle</span></a></li>
+                             }
+                            <li><a href="/FaultReport/FaultReportList" style="font-size:14.2px" class="">Tüm Arızalar</a></li>
+                            <li><a href="/FaultReport/FaultReportPcfList" style="font-size:14.2px" class="">PCF-BMF-KLM</a></li>
+                            <li><a href="/FaultReport/FaultReportBzdList" style="font-size:14.2px" class="">BZD</a></li>
+                            <li><a href="/FaultReport/FaultReportKmfList" style="font-size:14.2px" class="">KMF-ÇMF</a></li>
+                            <li><a href="/FaultReport/FaultReportTgetList" style="font-size:14.2px" class="">TGET</a></li>
+                        </ul>
+                    </div>
+                </li>
+                }
+                   @if (User.IsInRole("User") || User.IsInRole("Chef") || User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                 {
+                <li>
+                    <a href="#subPages7" data-toggle="collapse" class="collapsed"><img style="margin-left:-6px" src="~/img/administrative-tools.png" /> <span style="margin-left:3px">Proje Takip</span> <i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <div id="subPages7" class="collapse ">
+                        <ul class="nav">
+                             @if (User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                             {
+                            <li><a href="/ProjectReport/AddProjectReport" class=""><span>Proje Ekle</span></a></li>
+                             }
+                            <li><a href="/ProjectReport/ProjectReportList" style="font-size:14.2px" class="">Tüm Projeler</a></li>
+                            <li><a href="/ProjectReport/ProjectReportPcfList" style="font-size:14.2px" class="">PCF-BMF-KLM</a></li>
+                            <li><a href="/ProjectReport/ProjectReportBzdList" style="font-size:14.2px" class="">BZD</a></li>
+                            <li><a href="/ProjectReport/ProjectReportKmfList" style="font-size:14.2px" class="">KMF-ÇMF</a></li>
+                            <li><a href="/ProjectReport/ProjectReportTgetList" style="font-size:14.2px" class="">TGET</a></li>
+                        </ul>
+                    </div>
+                </li>
+                }
+                <li>
+                    <a href="#subPages4" data-toggle="collapse" class="collapsed"><i class="lnr lnr-cog"></i> <span>Araçlar</span> <i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <div id="subPages4" class="collapse ">
+                        <ul class="nav">
+                             @if (User.IsInRole("Admin") || User.IsInRole("Engineer") || User.IsInRole("SuperAdmin"))
+                             {
+                            <li><a href="/Equipment/AddEquipment" class="">Ekipman Ekle/Düzenle</a></li>
+                            <li><a style="font-size:14px" href="/EquipmentCategory/EquipmentCategory" class="">Ekipman Kategori Ekle/Düzenle</a></li>
+                            <li><a style="font-size:14px" href="/RobotCategory/RobotCategory" class="">Robot Kategori Ekle/Düzenle</a></li>
+                            <li><a style="font-size:14px" href="/Factory/AddFactory" class="">Fabrika Bölüm Ekle/Düzenle</a></li>
+                             }
+                            <li><a href="/Project/AllProject" class="">Tüm Projeler</a></li>
+                            <li><a href="/Equipment/AllEquipment" class="">Tüm Ekipmanlar</a></li>
+                            <li><a href="/Robot/AllRobot" class="">Tüm Robotlar</a></li>
+
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

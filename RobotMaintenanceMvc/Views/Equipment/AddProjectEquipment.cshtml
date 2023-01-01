@@ -1,0 +1,106 @@
+﻿@model ProjectListDto
+@{
+    Layout = null;
+    string[] projectId = new string[Model.Projects.Count];
+    int i = 0;
+    int equipmentId = 0;
+}
+<div class="modal fade" id="editAddProjectModal" tabindex="-1" role="dialog" aria-labelledby="scrollmodalLabel" aria-hidden="true" style="margin-top: 2%;width:auto; height:auto">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="modal-title" id="scrollmodalLabel">Projelere Ekipman Ekle</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="updateForm">
+                            <div class="col-md-12">
+                                <label style="margin-bottom:15px">Proje Seç</label>
+                                <br />
+                                <div id="divCheckBoxs">
+                                    @foreach (var item in Model.Projects)
+                                    {
+                                        projectId[i] = "CheckBox" + item.Id;
+                                        equipmentId = Convert.ToInt32(item.Note);
+                                        <div class="col-md-4" id="ccDeneme">
+                                            <label style="padding-bottom:5px" class="fancy-checkbox">
+                                                <input name="Deneme" type="checkbox" id="@projectId[i]" value="@item.Id">
+                                                <span>@item.Name</span>
+                                            </label>
+                                        </div>
+                                        i++;
+                                    }
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button id="updateBtn" onclick="updateProject()" class="btn btn-success">Ekle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var liste = new Array();
+    $('#divCheckBoxs').on("change", function () {
+        var Secilenler = "";
+        $('#divCheckBoxs :checked').each(function () {
+            Secilenler += $(this).val() + ",";
+        });
+        liste = Secilenler.split(",");
+    })
+    function updateProject() {
+        Swal.fire({
+            title: 'Ekipman seçilen tüm projelere eklenecek onaylamak istiyor musunuz?',
+            text: "Onaylandıktan sonra tekrar geri alınamaz!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Evet, onaylıyorum',
+            cancelButtonText: 'İptal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+        if (document.forms['updateForm'].reportValidity()) {
+            for (var i = 0; i < liste.length; i++) {
+            $.ajax({
+                url: '/ProjectEquipment/Add/',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'ProjectId': liste[i],
+                    'EquipmentId': @equipmentId,
+                },
+                success: function (data) {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Başarıyla kaydedilmiştir!',
+                        showConfirmButton: false,
+                        timer: 800
+                    }).then(() => {
+                        location.reload();
+                    })
+
+                },
+                error: function (data) {
+                }
+            });
+            }
+        }
+    }
+        })
+    }
+        // =====================================================
+
+
+
+</script>

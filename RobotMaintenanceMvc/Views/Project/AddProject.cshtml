@@ -1,0 +1,250 @@
+﻿<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>PROJE EKLE</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Proje Bilgileri</strong></h3>
+                            </div>
+                            <form id="form_id">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <label>Proje İsmi</label>
+                                            <input type="text" id="name" class="form-control" placeholder="Proje İsmi" required>
+                                            <br />
+                                            <label>Fabrika Seç</label>
+                                            <div id="factoryDiv">
+                                                <select name="select" id="factory" class="form-control" required>
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <label>Bölüm Seç</label>
+                                            <div id="factoryDepartmentDiv">
+                                                <select name="select" id="factoryDepartment" class="form-control" required>
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <br />
+                                        </div>
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <div class="col-md-6">
+                                            <button style="border-radius:10px;" type="button" onclick="addFactory()" class="btn btn-default"><i class="fa fa-plus-square"></i> Fabrika Ekle </button>
+                                            <br />
+                                            <br />
+                                            <br />
+                                            <button style="margin-top:5px;border-radius:10px;width:131.81px;" onclick="addFactoryDepartment()" type="button" class="btn btn-default"><i class="fa fa-plus-square"></i> Bölüm Ekle </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                </div>
+                                <div class="col-md-4">
+                                    <button id="add" onclick="postData()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">EKLE</button>
+                                </div>
+                                <div class="col-md-4">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        getFactories();
+
+        $('#factory').on("change", function () {
+            getFactoryDepartment();
+        })
+    });
+
+    // ===============================
+    // Factory
+    // ===============================
+    function getFactories() {
+        $.ajax({
+            type: "GET",
+            url: "/Factory/GetAll",
+            data: "{}",
+            success: function (data) {
+                var s = '';
+                for (var i = 0; i < data.factories.$values.length; i++) {
+                    s += '<option value="' + data.factories.$values[i].id + '">' + data.factories.$values[i].name + '</option>';
+                }
+                $("#factory").html(s);
+                getFactoryDepartment();
+            }
+        });
+    }
+    // ===============================
+    function addFactory() {
+        var name = '';
+        Swal.fire({
+            title: 'Fabrika adını giriniz!',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Vazgeç',
+            confirmButtonText: 'Ekle',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                if (login != '') {
+                    name = login;
+                }
+                else {
+                    Swal.showValidationMessage(
+                        `İsim alanı boş bırakılamaz!`
+                    )
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Factory/Add/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': name,
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            $("#factoryDiv").load(getFactories());
+                        })
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        })
+    }
+    // ===============================
+    // FactoryDepartment
+    // ===============================
+    function getFactoryDepartment() {
+        $.ajax({
+            type: "GET",
+            url: "/FactoryDepartment/GetByFactoryId?factoryId=" + $("#factory").val(),
+            success: function (data) {
+                $('#factoryDepartment').empty();
+                for (var i = 0; i < data.factoryDepartments.$values.length; i++) {
+                    var select = document.getElementById("factoryDepartment");
+                    select.appendChild(new Option(data.factoryDepartments.$values[i].name, data.factoryDepartments.$values[i].id));
+                }
+            }
+        });
+    }
+    // ===============================
+    function addFactoryDepartment() {
+        var name = '';
+        Swal.fire({
+            title: 'Bölüm adını giriniz!',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Vazgeç',
+            confirmButtonText: 'Ekle',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                if (login != '') {
+                    name = login;
+                }
+                else {
+                    Swal.showValidationMessage(
+                        `İsim alanı boş bırakılamaz!`
+                    )
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/FactoryDepartment/Add/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': name,
+                        'FactoryId': $("#factory").val(),
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            $("#factoryDepartmentDiv").load(getFactoryDepartment());
+                        })
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        })
+    }
+    // ===============================
+    function postData() {
+        if (document.forms['form_id'].reportValidity()) {
+            document.getElementById("add").disabled = true;
+            $.ajax({
+                url: '@Url.Action("Add", "Project")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'Name': $("#name").val(),
+                    'FactoryDepartmentId': $("#factoryDepartment").val(),
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bir hata oluştu.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+
+
+</script>

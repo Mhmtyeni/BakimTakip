@@ -1,0 +1,44 @@
+﻿@model RobotToBeMaintainedListDto
+@{    
+    int notificationCount = 0;    
+ }
+<div id="navbar-menu">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a style="background-color:transparent" href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
+                        <img style="width:30px;height:30px;" src="~/img/roboticon.png" />
+                        @if (Model.RobotToBeMaintained.Count > 0)
+                        {
+                    <span style="margin-right:-4px" class="badge bg-danger">@Model.RobotToBeMaintained.Count</span>}
+                    </a>
+                    <ul class="dropdown-menu notifications">
+                        <li><a style="font-weight:bold">ROBOT BAKIM ONAY BİLDİRİMLERİ</a></li>
+                        @foreach (var item in Model.RobotToBeMaintained)
+                        {
+                            if (notificationCount < 6)
+                            {
+                    <li>
+                        <a href="/RobotToBeMaintained/RobotMaintenance" class="notification-item">
+                            <span class="dot bg-danger"></span>
+                            <span style="font-weight:bold">@item.ProjectRobot.Project.Name</span>
+                            <span>projesindeki</span>  <span style="font-weight:bold">@item.RobotMaintenance.Robot.Name</span>
+                            <span>adlı robotun </span>
+                            <span style="font-weight:bold">@item.RobotMaintenance.Maintenance.Name</span>
+                            <span>bakım onayı gelmiştir!</span>
+                        </a>
+                    </li>
+                        notificationCount++;
+                                        }
+                                    }
+                        @if (Model.RobotToBeMaintained.Count == 0)
+                        {
+                            <li><a href="#" class="notification-item"><span class="dot bg-success"></span>Onaylanacak robot bakımı bulunmamaktadır.</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/RobotToBeMaintained/RobotMaintenance" class="more">Tüm bildirimler</a></li>
+                        }                        
+                    </ul>
+                </li>
+            </ul>
+        </div>

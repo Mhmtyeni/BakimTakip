@@ -1,0 +1,17 @@
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\obj\Debug\netcoreapp3.1\DataAccsessLayer.csprojAssemblyReference.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\obj\Debug\netcoreapp3.1\DataAccsessLayer.AssemblyInfoInputs.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\obj\Debug\netcoreapp3.1\DataAccsessLayer.AssemblyInfo.cs
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\obj\Debug\netcoreapp3.1\DataAccsessLayer.csproj.CoreCompileInputs.cache
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\bin\Debug\netcoreapp3.1\DataAccsessLayer.deps.json
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\bin\Debug\netcoreapp3.1\DataAccsessLayer.runtimeconfig.json
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\bin\Debug\netcoreapp3.1\DataAccsessLayer.runtimeconfig.dev.json
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\bin\Debug\netcoreapp3.1\DataAccsessLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\bin\Debug\netcoreapp3.1\DataAccsessLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\bin\Debug\netcoreapp3.1\EntityLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\bin\Debug\netcoreapp3.1\SharedLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\bin\Debug\netcoreapp3.1\EntityLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\bin\Debug\netcoreapp3.1\SharedLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\obj\Debug\netcoreapp3.1\DataAccsessLayer.csproj.CopyComplete
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\obj\Debug\netcoreapp3.1\DataAccsessLayer.dll
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\obj\Debug\netcoreapp3.1\DataAccsessLayer.pdb
+C:\Users\mehmetyen\source\repos\RobotMaintenance\DataAccsessLayer\obj\Debug\netcoreapp3.1\DataAccsessLayer.genruntimeconfig.cache

@@ -1,0 +1,190 @@
+﻿@model ProjectDto
+@{
+    Layout = null;
+}
+<div class="modal fade" id="editProjectModal" tabindex="-1" role="dialog" aria-labelledby="scrollmodalLabel" aria-hidden="true" style="margin-top: 2%;width:auto; height:auto">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="modal-title" id="scrollmodalLabel">Proje Düzenleme</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="updateForm">
+                            <div class="col-md-12">
+                                <label>Proje İsmi</label>
+                                <input type="text" id="projectNameEdit" class="form-control" placeholder="Proje İsmi" required value="@Model.Project.Name">
+                                <br />
+                                <label>Fabrika</label>
+                                <select name="select" id="factory" class="form-control">
+                                </select>
+                                <br />
+                                <label>Bölüm</label>
+                                <select name="select" id="factoryDepartment" class="form-control">
+                                </select>
+                                <br />
+                                <label>Ekipmanlar</label>
+                                <div id="equipmentDiv">
+                                    <select name="select" id="equipment" class="form-control">
+                                    </select>
+                                </div>
+                                <br />
+                                <label>Robotlar</label>
+                                <div id="robotDiv">
+                                    <select name="select" id="robot" class="form-control">
+                                    </select>
+                                </div>
+                                <br />
+                            </div>
+                        </form>
+                        @*<div class="col-md-3">
+                        </div>
+                        <div class="col-md-3">*@                          
+                        @*</div>*@
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button id="updateBtn" onclick="updateProject()" class="btn btn-success">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var bLoad = true
+    $(document).ready(function () {
+        getFactories(true);
+        getProjectRobots();
+        getProjectEquipments();
+        bLoad = false;
+        $('#factory').on("change", function () {
+            getFactoryDepartment();
+        })
+    });
+    // ===============================
+    // Factory
+    // ===============================
+    function getFactories(bLoad) {
+        $.ajax({
+            type: "GET",
+            url: "/Factory/GetAll",
+            data: "{}",
+            success: function (data) {
+                for (var i = 0; i < data.factories.$values.length; i++) {
+                    var select = document.getElementById("factory");
+                     if (@Model.Project.FactoryDepartment.FactoryId == data.factories.$values[i].id && bLoad)
+                        select.appendChild(new Option(data.factories.$values[i].name, data.factories.$values[i].id, true, true));
+                    else
+                        select.appendChild(new Option(data.factories.$values[i].name, data.factories.$values[i].id));
+                }
+                getFactoryDepartment(bLoad);
+            }
+        });
+    }
+    // ===============================
+    // FactoryDepartment
+    // ===============================
+    function getFactoryDepartment(bLoad) {
+        $.ajax({
+            type: "GET",
+            url: "/FactoryDepartment/GetByFactoryId?factoryId=" + $("#factory").val(),
+            success: function (data) {
+                $('#factoryDepartment').empty();
+                for (var i = 0; i < data.factoryDepartments.$values.length; i++) {
+                    var select = document.getElementById("factoryDepartment");
+                    if (@Model.Project.FactoryDepartmentId == data.factoryDepartments.$values[i].id && bLoad)
+                        select.appendChild(new Option(data.factoryDepartments.$values[i].name, data.factoryDepartments.$values[i].id, true, true));
+                    else
+                        select.appendChild(new Option(data.factoryDepartments.$values[i].name, data.factoryDepartments.$values[i].id));
+                }
+            }
+        });
+    }
+    // ===============================
+    // ProjecRobots
+    // ===============================
+    function getProjectRobots() {
+        $.ajax({
+            type: "GET",
+            url: "/ProjectRobot/GetByProjectId?projectId=" + @Model.Project.Id,
+            data: "{}",
+            success: function (data) {
+                $("#robot").empty();
+                for (var i = 0; i < data.length; i++) {
+                    var select = document.getElementById("robot");
+                    var start = data[i].indexOf("?");
+                    var end = data[i].length;
+                    robotId = data[i].substring(start + 1, end);
+                    robotName = data[i].substring(0, start);
+                    select.appendChild(new Option(robotName, robotId));
+                }
+            }
+        });
+    }
+    // ===============================
+    // ProjectEquipments
+    // ===============================
+    function getProjectEquipments() {
+        $.ajax({
+            type: "GET",
+            url: "/ProjectEquipment/GetByProjectId?projectId=" + @Model.Project.Id,
+            data: "{}",
+            success: function (data) {
+                $("#equipment").empty();
+                for (var i = 0; i < data.length; i++) {
+                    var select = document.getElementById("equipment");
+                    var start = data[i].indexOf("?");
+                    var end = data[i].length;
+                    equipmentId = data[i].substring(start + 1, end);
+                    equipmentName = data[i].substring(0, start);
+                    select.appendChild(new Option(equipmentName, equipmentId));
+                }
+            }
+        });
+    }
+    // ===============================
+    // ===============================
+    function updateProject() {
+        if (document.forms['updateForm'].reportValidity()) {
+            document.getElementById("updateBtn").disabled = true;
+         $.ajax({
+                 url: '/Project/Edit/',
+                 type: 'POST',
+                 dataType :'json',
+                 data: {
+                     'Id' : @Model.Project.Id,
+                     'Name': $("#projectNameEdit").val(),
+                     'FactoryDepartmentId': $("#factoryDepartment").val(),
+                     'CreatedDate': '@Model.Project.CreatedDate',
+                     'CreatedByName': '@Model.Project.CreatedByName',
+                },
+             success: function (data) {
+                 Swal.fire({
+                     position: 'center',
+                     icon: 'success',
+                     title: 'Başarıyla kaydedilmiştir!',
+                     showConfirmButton: false,
+                     timer: 800
+                 }).then(() => {
+                     location.reload();
+                 })
+
+                },
+                error: function (data) {
+                    document.getElementById("updateBtn").disabled = false;
+                }
+            });
+        }
+
+    };
+    // =====================================================
+
+
+
+</script>

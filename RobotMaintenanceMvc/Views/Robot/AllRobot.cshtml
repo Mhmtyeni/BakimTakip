@@ -1,0 +1,98 @@
+﻿<script src="~/js/excel-bootstrap-table-filter-bundle.min.js"></script>
+<link href="~/css/excel-bootstrap-table-filter-style.css" rel="stylesheet" />
+@model RobotListDto
+<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>TÜM ROBOTLAR</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Robot Bilgileri</strong></h3>
+                                <br />
+                                @if (Model.Robots.Count > 0)
+                                {
+                                    <table class="table table-striped" id="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="filter">Robot İsmi</th>
+                                                <th class="filter">Robot Kategorisi</th>
+                                                <th class="filter">Robot Açıklaması</th>
+                                                @if (User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                                                {
+                                                <th>Araçlar</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model.Robots)
+                                            {
+                                                <tr>
+                                                    <td>@item.Name</td>
+                                                    <td>@item.RobotCategory.Name</td>
+                                                    <td>@item.Note</td>
+                                                    @if (User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                                                    {
+                                                    <td>
+                                                        <a class="btn btn-warning" onclick="editRobot(@item.Id)">
+                                                            Düzenle
+                                                        </a>
+                                                        <a class="btn btn-primary" onclick="addProject(@item.Id)">
+                                                            Projeye Ekle
+                                                        </a>
+                                                    </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <center><i>Ekipman bulunamadı!</i></center>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="editRobotModalPage"></div>
+<div id="editAddProjectModalPage"></div>
+<script>
+    // =======================
+    // SEARCH
+    // =======================
+    $('#table').excelTableFilter({
+        columnSelector: '.filter',    // (optional) if present, will only select <th> with specified class
+        sort: true,                         // (optional) default true
+        search: true                    // (optional) default { a_to_z: 'A to Z', z_to_a: 'Z to A', search: 'Search', select_all: 'Select All' }
+    });
+    // =======================
+    function editRobot(robotId) {
+        $.ajax({
+            url: '/Robot/Edit/?Id=' + robotId,
+            success: function (data) {
+                $('#editRobotModalPage').html(data);
+                $('#editRobotModal').modal('show');
+            }
+        });
+    }
+    // =======================
+    // =======================
+    function addProject(robotId) {
+        $.ajax({
+            url: '/Robot/AddProjectRobot/?Id=' + robotId,
+            success: function (data) {
+                $('#editAddProjectModalPage').html(data);
+                $('#editAddProjectModal').modal('show');
+            }
+        });
+    }
+    // =======================
+</script>

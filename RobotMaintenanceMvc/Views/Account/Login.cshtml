@@ -1,0 +1,65 @@
+﻿@model AppUserLoginDto
+@{
+    Layout = null;
+}
+<link href="~/css/login.css" rel="stylesheet" />
+<link href="~/vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+<!DOCTYPE html>
+<div id="log-reg-screen">
+    <div style="height:580px" class="loginster">
+        <div id="button-box">
+            <div id="btn"></div>
+            <button type="button" class="toggle-btn" onclick="login()"> Giriş</button>
+            <button type="button" class="toggle-btn" onclick="register()">Kayıt</button>
+        </div>
+        <div id="picture">
+            <img style="height:590px;width:440px" src="~/assets/img/5.png" alt="login/register-picture">
+        </div>
+        <div id="login" class="input-group">
+            <h1>Giriş</h1>
+            <hr class="special-hr">
+            <div class="content">
+                <form asp-action="Login" method="post">
+                    <center>
+                        @if (ViewData.ModelState[""] != null && ViewData.ModelState[""].Errors.Count > 0)
+                        {
+                            <div class="alert">
+                                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                                <span>@Html.ValidationSummary()</span>
+                            </div>
+                        }
+                    </center>
+                    <input type="text" class="input-field" name="UserName" placeholder="Sicil" autocomplete="off" onkeypress="return isNumberKey(event)" required>
+                    <input type="password" class="input-field" name="Password" placeholder="Şifre" autocomplete="off" required>
+                    <input type="checkbox" class="check-box" name="checkbox">
+                    <label for="checkbox">Beni Hatırla</label>
+                    <button type="submit" class="submit-btn">Giriş Yap</button>
+                </form>
+            </div>
+        </div>
+        <div id="register" class="input-group">
+            <h1>Kayıt Ol</h1>
+            <hr class="special-hr">
+            <div class="content">
+                <form asp-action="Register" method="post">
+                    <input type="text" class="input-field" name="UserName" placeholder="Sicil" autocomplete="off" onkeypress="return isNumberKey(event)" required>
+                    <input type="text" class="input-field" name="FirstName" placeholder="Ad" autocomplete="off" required>
+                    <input type="text" class="input-field" name="LastName" placeholder="Soyad" autocomplete="off" required>
+                    <input type="email" class="input-field" name="Email" placeholder="Email" autocomplete="off" required>
+                    <input type="password" class="input-field" name="Password" placeholder="Şifre" autocomplete="off" required>
+                    <button type="submit" class="submit-btn">Kayıt Ol</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/login.js"></script>
+<script>
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+</script>
+

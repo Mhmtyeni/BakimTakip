@@ -1,0 +1,153 @@
+﻿@model FaultReportDto
+@{
+    Layout = null;
+    DateTime dateTime = Convert.ToDateTime(Model.FaultReport.Deadline1.ToShortDateString());
+    string year, mounth, day;
+    year = dateTime.Year.ToString();
+    mounth = dateTime.Month.ToString();
+    day = dateTime.Day.ToString();
+    if (day.Length == 1)
+    {
+        day = "0" + day;
+    }
+    if (mounth.Length == 1)
+    {
+        mounth = "0" + mounth;
+    }
+}
+<div class="modal fade" id="editFaultReportModal" tabindex="-1" role="dialog" aria-labelledby="scrollmodalLabel" aria-hidden="true" style="margin-top: 2%;width:auto; height:auto">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <label class="modal-title" id="scrollmodalLabel">Arıza Düzenleme</label>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form id="updateForm">
+                            <div class="col-md-12">
+                                <label>Fabrika İsmi</label>
+                                <input type="text" id="projectName" class="form-control" placeholder="Proje İsmi" required value="@Model.FaultReport.Project.FactoryDepartment.Factory.Name" readonly>
+                                <br />
+                                <label>Bölüm İsmi</label>
+                                <input type="text" id="projectName" class="form-control" placeholder="Proje İsmi" required value="@Model.FaultReport.Project.FactoryDepartment.Name" readonly>
+                                <br />
+                                <label>Proje İsmi</label>
+                                <select name="select" id="project" class="form-control" required>
+                                </select>
+                                @*<input type="text" id="projectName" class="form-control" placeholder="Proje İsmi" required value="@Model.FaultReport.Project.Name" readonly>*@
+                                <br />
+                                <label>Arızayla İlgili Madde</label>
+                                <input type="text" id="fault" class="form-control" placeholder="Arızayla İlgili Madde" required value="@Model.FaultReport.Fault">
+                                <br />
+                                <label>Açıklama</label>
+                                <input type="text" id="comment" class="form-control" placeholder="Açıklama" required value="@Model.FaultReport.Comment">
+                                <br />
+                                <label>Sorumlu</label>
+                                <input type="text" id="users" class="form-control" placeholder="Sorumlular" required value="@Model.FaultReport.Note.Substring(0, Model.FaultReport.Note.Length - 2)" readonly>
+                                <br />
+                                <button onclick="editUser(@Model.FaultReport.Id)" style="width:150px" type="button" class="btn btn-primary">Sorumlu Değiştir</button>
+                                <br />
+                                <br />
+                                <label>Termin</label>
+                                <br />
+                                <input style="width:200px" type="date" id="deadlineDate" name="deadlineDate" value="@year-@mounth-@day" max="2025-12-31" required>
+                                <br />
+                                <br />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button id="updateBtn" onclick="updateFaultReport()" class="btn btn-success">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="editUserModalPage"></div>
+<script>
+    $(document).ready(function () {
+        getProjects();
+    });
+    function editUser(Id) {
+        $.ajax({
+            url: '/FaultReport/EditUser/?Id=' + Id,
+            success: function (data) {
+                $('#editUserModalPage').html(data);
+                $('#editUserModal').modal('show');
+            }
+        });
+    }
+    // ===============================
+    // ===============================
+    // Project
+    // ===============================
+    function getProjects() {
+        $.ajax({
+            type: "GET",
+            url: "/Project/GetAll",
+            data: "{}",
+            success: function (data) {
+                //var s = '';
+                //for (var i = 0; i < data.projects.$values.length; i++) {
+                //    s += '<option value="' + data.projects.$values[i].id + '">' + data.projects.$values[i].name + '</option>';
+                //}
+                for (var i = 0; i < data.projects.$values.length; i++) {
+                    var select = document.getElementById("project");
+                    if (@Model.FaultReport.ProjectId == data.projects.$values[i].id)
+                        select.appendChild(new Option(data.projects.$values[i].name, data.projects.$values[i].id, true, true));
+                    else
+                        select.appendChild(new Option(data.projects.$values[i].name, data.projects.$values[i].id));
+                }
+            }
+        });
+    }
+    // ===============================
+    function updateFaultReport() {
+            if (document.forms['updateForm'].reportValidity()) {
+                document.getElementById("updateBtn").disabled = true;
+             $.ajax({
+                     url: '/FaultReport/Edit2/',
+                     type: 'POST',
+                     dataType :'json',
+                     data: {
+                         'Id' : @Model.FaultReport.Id,
+                         'ProjectId': $("#project").val(),
+                         'Fault': $("#fault").val(),
+                         'AppUserId': 2,
+                         'Comment': $("#comment").val(),
+                         'Deadline1': $("#deadlineDate").val(),
+                         'Completed': '@Model.FaultReport.Completed',
+                         'CreatedDate': '@Model.FaultReport.CreatedDate',
+                         'CreatedByName': '@Model.FaultReport.CreatedByName',
+                    },
+                 success: function (data) {
+                     Swal.fire({
+                         position: 'center',
+                         icon: 'success',
+                         title: 'Başarıyla kaydedilmiştir!',
+                         showConfirmButton: false,
+                         timer: 800
+                     }).then(() => {
+                         location.reload();
+                     })
+
+                    },
+                    error: function (data) {
+                        document.getElementById("updateBtn").disabled = false;
+                    }
+                });
+            }
+
+        };
+    // =====================================================
+
+
+
+</script>

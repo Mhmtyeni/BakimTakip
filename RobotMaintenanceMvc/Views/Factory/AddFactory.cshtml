@@ -1,0 +1,335 @@
+﻿<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>FABRİKA EKLE/DÜZENLE</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Fabrika Bilgileri</strong></h3>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    @*=====================================FABRİKA EKLE======================================================*@
+                                    <form id="form_addFactory">
+                                        <div class="col-md-5">
+                                            <h3 class="panel-title" style="text-align:center"><strong>Fabrika Ekle</strong></h3>
+                                            <br />
+                                            <label>Fabrika İsmi</label>
+                                            <input type="text" id="factoryNameAdd" class="form-control" placeholder="Fabrika İsmi" required>
+                                            <br />
+                                            <button id="addFactory" onclick="postFactoryAdd()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">EKLE</button>
+                                            <br />
+                                            <br />
+                                        </div>
+                                    </form>
+                                    @*=====================================CENTER DIV======================================================*@
+                                    <div class="col-md-2">
+                                    </div>
+                                    @*=====================================FABRİKA DÜZENLE======================================================*@
+
+                                    <form id="form_editFactory" method="post">
+                                        <div class="col-md-5">
+                                            <h3 class="panel-title" style="text-align:center"><strong>Fabrika Düzenle</strong></h3>
+                                            <br />
+                                            <label>Fabrika Seç</label>
+                                            <select name="select" id="factory" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <label>Fabrika İsmi</label>
+                                            <input type="text" id="factoryNameEdit" class="form-control" placeholder="Fabrika İsmi" required>
+                                            <br />
+                                            <button id="editFactory" onclick="postFactoryEdit()" style="border-radius:10px;" type="submit" class="btn btn-primary btn-block">KAYDET</button>
+                                            <br />
+                                            <br />
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h2 class="page-title" style="text-align:center"><strong>BÖLÜM EKLE/DÜZENLE</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Bölüm Bilgileri</strong></h3>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    @*=====================================BÖLÜM EKLE======================================================*@
+                                    <form id="form_addDepartment">
+                                        <div class="col-md-5">
+                                            <h3 class="panel-title" style="text-align:center"><strong>Bölüm Ekle</strong></h3>
+                                            <br />
+                                            <label>Fabrika Seç</label>
+                                            <select name="select" id="factory2" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <label>Bölüm İsmi</label>
+                                            <input type="text" id="departmentNameAdd" class="form-control" placeholder="Bölüm İsmi" required>
+                                            <br />
+                                            <button id="addDepartment" onclick="postDepartmentAdd()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">EKLE</button>
+                                            <br />
+                                            <br />
+                                        </div>
+                                    </form>
+                                    @*=====================================CENTER DIV======================================================*@
+                                    <div class="col-md-2">
+                                    </div>
+                                    @*=====================================BÖLÜM DÜZENLE======================================================*@
+
+                                    <form id="form_editDepartment" method="post">
+                                        <div class="col-md-5">
+                                            <h3 class="panel-title" style="text-align:center"><strong>Bölüm Düzenle</strong></h3>
+                                            <br />
+                                            <label>Fabrika Seç</label>
+                                            <select name="select" id="factory3" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <label>Bölüm Seç</label>
+                                            <select name="select" id="department" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <label>Bölüm İsmi</label>
+                                            <input type="text" id="departmentNameEdit" class="form-control" placeholder="Bölüm İsmi" required>
+                                            <br />
+                                            <button id="editDepartment" onclick="postDepartmentEdit()" style="border-radius:10px;" type="submit" class="btn btn-primary btn-block">KAYDET</button>
+                                            <br />
+                                            <br />
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        $(document).ready(function () {
+            getFactories();
+        });
+
+        $('#factory3').on("change", function () {
+            getDepartments();
+        })
+
+        // ===============================
+        // FACTORY
+        // ===============================
+        // ===============================
+        function getFactories() {
+                $.ajax({
+                    type: "GET",
+                    url: "/Factory/GetAll",
+                    data: "{}",
+                    success: function (data) {
+                        var s = '';
+                        for (var i = 0; i < data.factories.$values.length; i++) {
+                            s += '<option value="' + data.factories.$values[i].id + '">' + data.factories.$values[i].name + '</option>';
+                        }
+                        $("#factory").html(s);
+                        $("#factory2").html(s);
+                        $("#factory3").html(s);
+                        getDepartments();
+                    }
+                });
+        }
+        // ===============================
+        function postFactoryAdd() {
+            if (document.forms['form_addFactory'].reportValidity()) {
+                document.getElementById("addFactory").disabled = true;
+                $.ajax({
+                    url: '@Url.Action("Add", "Factory")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': $("#factoryNameAdd").val(),
+                    },
+                    success: function (data) {
+                        if (data == true) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Başarıyla eklenmiştir!',
+                                showConfirmButton: false,
+                                timer: 800
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Bu fabrika daha önce eklenmiştir.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+    }
+        // ===============================
+        function postFactoryEdit() {
+             if (document.forms['form_editFactory'].reportValidity()) {
+                 document.getElementById("editFactory").disabled = true;
+                $.ajax({
+                    url: '/Factory/Edit/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': $("#factoryNameEdit").val(),
+                        'Id': $("#factory").val(),
+                    },
+                    success: function (data) {
+                        if (data == true) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Başarıyla güncellenmiştir!',
+                                showConfirmButton: false,
+                                timer: 800
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Aynı isimde bir fabrika mevcut!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+    }
+        // ===============================
+        // ===============================
+
+        // ===============================
+        // DEPARTMENT
+        // ===============================
+        function getDepartments() {
+                $.ajax({
+                    type: "GET",
+                    url: "/FactoryDepartment/GetByFactoryId?factoryId=" + $("#factory3").val(),
+                    data: "{}",
+                    success: function (data) {
+                        var s = '';
+                        for (var i = 0; i < data.factoryDepartments.$values.length; i++) {
+                            s += '<option value="' + data.factoryDepartments.$values[i].id + '">' + data.factoryDepartments.$values[i].name + '</option>';
+                        }
+                        $("#department").html(s);
+                    }
+                });
+        }
+        // ===============================
+        function postDepartmentAdd() {
+            if (document.forms['form_addDepartment'].reportValidity()) {
+                document.getElementById("addDepartment").disabled = true;
+                $.ajax({
+                    url: '@Url.Action("Add", "FactoryDepartment")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': $("#departmentNameAdd").val(),
+                        'FactoryId': $("#factory2").val(),
+                    },
+                    success: function (data) {
+                        if (data == true) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Başarıyla eklenmiştir!',
+                                showConfirmButton: false,
+                                timer: 800
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Bu bölüm daha önce eklenmiştir.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+    }
+        // ===============================
+        function postDepartmentEdit() {
+             if (document.forms['form_editDepartment'].reportValidity()) {
+                 document.getElementById("editDepartment").disabled = true;
+                $.ajax({
+                    url: '/FactoryDepartment/Edit/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': $("#departmentNameEdit").val(),
+                        'Id': $("#department").val(),
+                        'FactoryId': $("#factory3").val(),
+                    },
+                    success: function (data) {
+                        if (data == true) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Başarıyla güncellenmiştir!',
+                                showConfirmButton: false,
+                                timer: 800
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Aynı isimde bir fabrika mevcut!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            })
+                        }
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+    }
+        // ===============================
+        // ===============================
+</script>

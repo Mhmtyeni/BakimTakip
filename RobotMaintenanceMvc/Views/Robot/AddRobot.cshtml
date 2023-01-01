@@ -1,0 +1,317 @@
+﻿<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>ROBOT EKLE/DÜZENLE</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Robot Bilgileri</strong></h3>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    @*=====================================ROBOT EKLE======================================================*@
+                                    <form id="form_add">
+                                        <div class="col-md-5">
+                                            <h3 class="panel-title" style="text-align:center"><strong>Robot Ekle</strong></h3>
+                                            <br />
+                                            <label>Kategori Seç</label>
+                                            <div id="categoryDiv">
+                                                <select name="select" id="robotCategory" class="form-control" required>
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <label>Robot İsmi</label>
+                                            <input type="text" id="robotNameAdd" class="form-control" placeholder="Robot İsmi" required>
+                                            <br />
+                                            <label>Robot Açıklaması</label>
+                                            <textarea style="height:100px" type="text" id="maintenanceCommentAdd" class="form-control" placeholder="Açıklama"></textarea>
+                                            <br />
+                                            <button id="add" onclick="postDataAdd()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">EKLE</button>
+                                            <br />
+                                            <br />
+                                        </div>
+                                    </form>
+                                    @*=====================================BUTTONS======================================================*@
+                                    <div class="col-md-2">
+                                        <center>
+                                            <br />
+                                            <br />
+                                            <br />
+                                            <button style="margin-top: 0px; border-radius: 10px; width: 156.2px;" type="button" onclick="addRobotCategory()" class="btn btn-default"><i class="fa fa-plus-square"></i> Kategori Ekle </button>
+                                            <br />
+                                            <br />
+                                            <br />
+                                        </center>
+                                    </div>
+                                    @*=====================================ROBOT DÜZENLE======================================================*@
+
+                                    <form id="form_edit" asp-action="Edit" asp-controller="Equipment" method="post">
+                                        <div class="col-md-5">
+                                            <h3 class="panel-title" style="text-align:center"><strong>Robot Düzenle</strong></h3>
+                                            <br />
+                                            <label>Kategori Seç</label>
+                                            <div id="categoryDiv2">
+                                                <select name="select" id="robotCategory2" class="form-control" required>
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <label>Robot Seç</label>
+                                            <div id="robotDiv2">
+                                                <select name="select" id="robot2" class="form-control" required>
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <label>Robot İsmi</label>
+                                            <input type="text" id="robotNameEdit" class="form-control" placeholder="Robot İsmi" required>
+                                            <br />
+                                            <label>Robot Açıklaması</label>
+                                            <textarea style="height:100px" type="text" id="maintenanceCommentEdit" class="form-control" placeholder="Açıklama"></textarea>
+                                            <br />
+                                            <button id="edit" onclick="postDataEdit()" style="border-radius:10px;" type="submit" class="btn btn-primary btn-block">KAYDET</button>
+                                            <br />
+                                            <br />
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var robotId, createdDate, createName;
+    $(document).ready(function () {
+        getRobotCategories();
+        getRobotCategories2();
+
+        $('#robotCategory2').on("change", function () {
+            getRobots2();
+        })
+
+        $('#robot2').on("change", function () {
+            getRobotInfo();
+        })
+    });
+
+    // ===============================
+    // RobotCategory
+    // ===============================
+    function addRobotCategory() {
+        var name = '';
+        Swal.fire({
+            title: 'Kategori adını giriniz!',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Vazgeç',
+            confirmButtonText: 'Ekle',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                if (login != '') {
+                    name = login;
+                }
+                else {
+                    Swal.showValidationMessage(
+                        `İsim alanı boş bırakılamaz!`
+                    )
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/RobotCategory/Add/',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        'Name': name,
+                    },
+                    success: function (data) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            $("#categoryDiv").load(getRobotCategories());
+                            $("#categoryDiv2").load(getRobotCategories2());
+                        })
+                    },
+                    error: function (data) {
+                    }
+                });
+            }
+        })
+    }
+    // ===============================
+    function getRobotCategories() {
+
+            $.ajax({
+                type: "GET",
+                url: "/RobotCategory/GetAll",
+                data: "{}",
+                success: function (data) {
+                    var s = '';
+                    for (var i = 0; i < data.robotCategories.$values.length; i++) {
+                        s += '<option value="' + data.robotCategories.$values[i].id + '">' + data.robotCategories.$values[i].name + '</option>';
+                    }
+                    $("#robotCategory").html(s);
+                }
+            });
+    }
+    // ===============================
+    function getRobotCategories2() {
+
+        $.ajax({
+            type: "GET",
+            url: "/RobotCategory/GetAll",
+            data: "{}",
+            success: function (data) {
+                var s = '';
+                for (var i = 0; i < data.robotCategories.$values.length; i++) {
+                    s += '<option value="' + data.robotCategories.$values[i].id + '">' + data.robotCategories.$values[i].name + '</option>';
+                }
+                $("#robotCategory2").html(s);
+                getRobots2();
+            }
+        });
+    }
+
+    // ===============================
+    function getRobotInfo() {
+        $.ajax({
+            type: "GET",
+            url: "/Robot/GetById?robotId=" + $("#robot2").val(),
+            success: function (data) {
+                if (data == null) {
+                    $('#robotNameEdit').val("");
+                    $('#maintenanceCommentEdit').val("");
+                }
+                else {
+                    $('#robotNameEdit').val(data.robot.name);
+                    $('#maintenanceCommentEdit').val(data.robot.note);                
+                    robotId = data.robot.id;
+                    createdDate = data.robot.createdDate;
+                    createdName = data.robot.createName;
+                }
+            }
+        });
+    }
+
+    // ===============================
+    function getRobots2() {
+        $.ajax({
+            type: "GET",
+            url: "/Robot/GetByRobotCategoryId?robotCategoryId=" + $("#robotCategory2").val(),
+            success: function (data) {
+                $('#robot2').empty();
+                for (var i = 0; i < data.robots.$values.length; i++) {
+                    var select = document.getElementById("robot2");
+                    select.appendChild(new Option(data.robots.$values[i].name, data.robots.$values[i].id));
+                }
+                getRobotInfo();
+            }
+        });
+    }
+    // ===============================
+
+    function postDataAdd() {
+        if (document.forms['form_add'].reportValidity()) {
+            document.getElementById("add").disabled = true;
+            $.ajax({
+                url: '@Url.Action("Add", "Robot")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'Name': $("#robotNameAdd").val(),
+                    'RobotCategoryId': $("#robotCategory").val(),
+                    'Note': $("#maintenanceCommentAdd").val(),
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bu ekipman daha önce eklenmiştir.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+
+    function postDataEdit() {
+         if (document.forms['form_edit'].reportValidity()) {
+             document.getElementById("edit").disabled = true;
+            $.ajax({
+                url: '/Robot/Edit/',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'Name': $("#robotNameEdit").val(),
+                    'RobotCategoryId': $("#robotCategory2").val(),
+                    'Note': $("#maintenanceCommentEdit").val(),
+                    'Id': robotId,
+                    'CreatedDate': createdDate,
+                    'CreatedName': createdName,
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla güncellenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Aynı isimde bir robot mevcut!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+
+
+
+</script>

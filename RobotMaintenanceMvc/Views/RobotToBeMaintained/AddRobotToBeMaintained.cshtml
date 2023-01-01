@@ -1,0 +1,267 @@
+﻿<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>ROBOT BAKIM DÜZENLEME</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Proje ve Robot Bilgileri</strong></h3>
+                            </div>
+                            <form id="form_id">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-md-5">
+                                            <label>Proje Seç</label>
+                                            <select name="select" id="project" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <label>Robot Seç</label>
+                                            <div id="robotDiv">
+                                                <select name="select" id="robot" class="form-control" required>
+                                                </select>
+                                            </div>
+                                            <br />
+                                            <label>Bakım Seç</label>
+                                            <select name="select" id="maintenance" class="form-control" required>
+                                            </select>
+                                            <br />
+                                            <br />
+                                            <label>Bakım Yapıldı Mı ?</label>
+                                            <br />
+                                            <br />
+                                            <div class="row" id="radioDiv">
+                                                <div class="col-md-2">
+                                                    <label class="fancy-radio">
+                                                        <input id="radioBtnYes" name="radioBtn" value="yes" type="radio">
+                                                        <span><i></i>Yapıldı</span>
+                                                    </label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="fancy-radio">
+                                                        <input id="radioBtnNo" name="radioBtn" value="no" type="radio">
+                                                        <span><i></i>Yapılmadı</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <div id="dateDiv" style="display:none;">
+                                                <label>Bakım Yapılma Tarihi</label>
+                                                <br />
+                                                <br />
+                                                <input style="width:175px" type="date" id="maintenanceDate" name="maintenanceDate" value="@DateTime.Now" min="2018-01-01" max="2025-12-31">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                </div>
+                                <div class="col-md-4">
+                                    <button id="add" disabled onclick="postData()" style="border-radius:10px;" type="button" class="btn btn-success btn-block">KAYDET</button>
+                                </div>
+                                <div class="col-md-4">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var robotId, robotName, projectRobotId, robotMaintenanceDate, doneOrNotDone, robotMaintenanceId;
+    $(document).ready(function () {
+        getProjects();
+        var div = document.getElementById("dateDiv");
+        // ========================
+        // DATETIME.NOW
+        // ========================
+
+        function getDateTime() {
+            var now = new Date();
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var day = now.getDate();
+            if (month.toString().length == 1) {
+                month = '0' + month;
+            }
+            if (day.toString().length == 1) {
+                day = '0' + day;
+            }
+            robotMaintenanceDate = year + '-' + month + '-' + day;
+        }
+
+        // =========================
+
+        $('#project').on("change", function () {
+            getProjectRobots();
+        })
+        $('#robot').on("change", function () {
+            getRobotMaintenance();
+            //getProjectRobotId();
+        })
+        $('#maintenance').on("change", function () {
+            getRobotMaintenanceId();
+        })
+
+
+        // ===============================
+        // RADIO BUTTON
+        $('#radioBtnNo').on("change", function () {
+            div.style.display = "none";
+            getDateTime()
+            document.getElementById("add").disabled = false;
+            doneOrNotDone = false;
+        })
+        $('#radioBtnYes').on("change", function () {
+            div.style.display = "";
+            document.getElementById("add").disabled = false;
+            robotMaintenanceDate = document.getElementById("maintenanceDate").value;
+            doneOrNotDone = true;
+        })
+        $('#maintenanceDate').on("change", function () {
+            robotMaintenanceDate = document.getElementById("maintenanceDate").value;
+
+        })
+        // ===============================
+    });
+    // ===============================
+    // Project
+    // ===============================
+    function getProjects() {
+        $.ajax({
+            type: "GET",
+            url: "/Project/GetAll",
+            data: "{}",
+            success: function (data) {
+                var s = '';
+                for (var i = 0; i < data.projects.$values.length; i++) {
+                    s += '<option value="' + data.projects.$values[i].id + '">' + data.projects.$values[i].name + '</option>';
+                }
+                $("#project").html(s);
+                getProjectRobots();
+            }
+        });
+    }
+
+    // ===============================
+    // ProjecRobots
+    // ===============================
+    function getProjectRobots() {
+        $.ajax({
+            type: "GET",
+            url: "/ProjectRobot/GetByProjectId?projectId=" + $("#project").val(),
+            data: "{}",
+            success: function (data) {
+                $("#robot").empty();
+                for (var i = 0; i < data.length; i++) {
+                    var select = document.getElementById("robot");
+                    var start = data[i].indexOf("?");
+                    var end = data[i].length;
+                    robotId = data[i].substring(start + 1, end);
+                    robotName = data[i].substring(0, start);
+                    select.appendChild(new Option(robotName, robotId));
+                }
+                getRobotMaintenance();
+            }
+        });
+    }
+    // ===============================
+    function getProjectRobotId() {
+        $.ajax({
+            type: "GET",
+            url: "/ProjectRobot/GetByProjectRobotId?sRobotId=" + $("#robot").val() + "?" + $("#project").val(),
+            success: function (data) {
+                projectRobotId = data;    
+            }
+        });
+    }
+    // ===============================
+    // ===============================
+    function getRobotMaintenanceId() {
+        $.ajax({
+            type: "GET",
+            url: "/RobotMaintenance/GetAllMaintenance?sRobotId=" + $("#robot").val() + "?" + $("#maintenance").val(),
+            success: function (data) {
+                robotMaintenanceId = data;
+            }
+        });
+    }
+    // ===============================
+
+    // ===============================
+    function getRobotMaintenance() {
+        if ($("#robot").val() != null) {
+            $.ajax({
+                type: "GET",
+                url: "/RobotMaintenance/GetByRobotId?robotId=" + $("#robot").val(),
+                success: function (data) {
+                    $("#maintenance").empty();
+                    for (var i = 0; i < data.length; i++) {
+                        var select = document.getElementById("maintenance");
+                        var start = data[i].indexOf("?");
+                        var end = data[i].length;
+                        robotId = data[i].substring(start + 1, end);
+                        robotName = data[i].substring(0, start);
+                        select.appendChild(new Option(robotName, robotId));
+                    }
+                    getProjectRobotId();
+                    getRobotMaintenanceId();
+                }
+            });
+        }
+    }
+
+
+    // ===============================
+
+    function postData() {
+        if (document.forms['form_id'].reportValidity()) {
+            document.getElementById("add").disabled = true;
+            $.ajax({
+                url: '@Url.Action("Add", "RobotToBeMaintained")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'ProjectRobotId': projectRobotId,
+                    'MaintenanceDate': robotMaintenanceDate,
+                    'DoneOrNotDone': doneOrNotDone,
+                    'RobotMaintenanceId': robotMaintenanceId,
+                    'CheckOrDenied': 'False',
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla eklenmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bu robota daha önce bakım planı eklenmiş!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+        }
+    }
+
+
+</script>

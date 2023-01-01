@@ -1,0 +1,110 @@
+﻿@model EquipmentListDto
+<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>EKİPMANLAR</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" style="text-align:center"><strong>Ekipman Bilgileri</strong></h3>
+                                <br />
+                                @if (Model != null)
+                                {
+                                    @if (Model.Equipments.Count > 0)
+                                    {
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ekipman İsmi</th>
+                                                    <th>Ekipman Kategorisi</th>
+                                                    <th>Period</th>
+                                                    <th>Bakım İsmi</th>
+                                                    <th>Bakım Açıklaması</th>
+                                                    @if (User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                                                    {
+                                                    <th>Araçlar</th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model.Equipments)
+                                                {
+                                                    <tr>
+                                                        <td onclick="selectEquipment(@item.Id)">@item.Name</td>
+                                                        <td>@item.EquipmentCategory.Name</td>
+                                                        <td>@item.Period</td>
+                                                        <td>@item.MaintenanceName</td>
+                                                        <td>@item.MaintenanceComment</td>
+                                                        @if (User.IsInRole("Engineer") || User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                                                        {
+                                                        <td>
+                                                            <a class="btn btn-warning" onclick="editEquipment(@item.Id)">
+                                                                Düzenle
+                                                            </a>
+                                                            <a class="btn btn-primary" onclick="addProject(@item.Id)">
+                                                                Projeye Ekle
+                                                            </a>
+                                                        </td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <center><i>Ekipman bulunamadı!</i></center>
+                                    }
+                                }
+                                else
+                                {
+                                    <center><i>Ekipman bulunamadı!</i></center>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="selectProjectModalPage"></div>
+<div id="editEquipmentModalPage"></div>
+<div id="editAddProjectModalPage"></div>
+<script>
+    // =======================
+    function selectEquipment(equipmentId) {
+        $.ajax({
+            url: '/Equipment/Select/?Id=' + equipmentId,
+            success: function (data) {
+                $('#selectProjectModalPage').html(data);
+                $('#selectProjectModal').modal('show');
+            }
+        });
+    }
+    // =======================
+    function editEquipment(equipmentId) {
+        $.ajax({
+            url: '/Equipment/Edit/?Id=' + equipmentId,
+            success: function (data) {
+                $('#editEquipmentModalPage').html(data);
+                $('#editEquipmentModal').modal('show');
+            }
+        });
+    }
+    // =======================
+    // =======================
+    function addProject(equipmentId) {
+        $.ajax({
+            url: '/Equipment/AddProjectEquipment/?Id=' + equipmentId,
+            success: function (data) {
+                $('#editAddProjectModalPage').html(data);
+                $('#editAddProjectModal').modal('show');
+            }
+        });
+    }
+    // =======================
+</script>

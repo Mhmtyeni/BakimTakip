@@ -1,0 +1,353 @@
+﻿<script src="~/js/excel-bootstrap-table-filter-bundle.min.js"></script>
+<link href="~/css/excel-bootstrap-table-filter-style.css" rel="stylesheet" />
+@model ProjectReportListDto
+<div class="main">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <h2 class="page-title" style="text-align:center"><strong>TÜM PROJELER</strong></h2>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-11">
+                                        <h3 class="panel-title" style="text-align:center"><strong>Proje Bilgileri</strong></h3>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <a id="exportTget" name="exportTget" class="btn btn-block btn-success" style="left:0;">
+                                            <span class="fa fa-file-excel-o" style="color:white;"></span> <span style="color:white;font-weight:bold">Excel</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <br />
+                                @if (Model.ProjectReports.Count > 0)
+                                {
+                                    <table class="table table-striped" id="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="filter">Fabrika İsmi</th>
+                                                <th class="filter">Bölüm İsmi</th>
+                                                <th class="filter">Proje İsmi</th>
+                                                <th class="filter">Proje ile İlgili Madde</th>
+                                                <th>Sorumlu</th>
+                                                <th>Açıklama</th>
+                                                <th class="filter">Termin</th>
+                                                <th class="filter">Durum</th>
+                                                <th>Araçlar</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model.ProjectReports)
+                                            {
+                                                string textcolor = "";
+                                                if (item.Deadline <= DateTime.Now && item.Completed == false)
+                                                    textcolor = "red";
+                                                else
+                                                    textcolor = "";
+                                                <tr>
+                                                    <td style="color:@textcolor">@item.Project.FactoryDepartment.Factory.Name</td>
+                                                    <td style="color:@textcolor">@item.Project.FactoryDepartment.Name</td>
+                                                    <td style="color:@textcolor">@item.Project.Name</td>
+                                                    <td style="color:@textcolor">@item.Fault</td>
+                                                    <td style="color:@textcolor">@item.Note.Substring(0, item.Note.Length - 2)</td>
+                                                    <td style="color:@textcolor">@item.Comment</td>
+                                                    <td style="color:@textcolor">@item.Deadline.ToShortDateString()</td>
+                                                    @if (item.Completed && item.CreatedByName != "İptal Edildi")
+                                                    {
+                                                        <td><span style="font-size:13px" class="label label-success">Tamamlandı</span></td>
+                                                    }
+                                                    else if (!item.Completed && DateTime.Now <= item.Deadline && item.CreatedByName != "İptal Edildi")
+                                                    {
+                                                        <td><span style="font-size:13px" class="label label-warning">Devam ediyor</span></td>
+                                                    }
+                                                    else if (item.Deadline <= DateTime.Now && item.CreatedByName != "İptal Edildi")
+                                                    {
+                                                        <td><span style="font-size:13px" class="label label-danger">Termin gecikti</span></td>
+                                                    }
+                                                    else if (item.CreatedByName == "İptal Edildi")
+                                                    {
+                                                        <td><span style="font-size:13px" class="label label-danger">İptal Edildi</span></td>
+
+                                                    }
+                                                    @if (!item.Completed && item.CreatedByName != "İptal Edildi")
+                                                    {
+                                                        <td>
+                                                            <a style="height:30px;width:30px" class="btn btn-success" onclick="completeFault(@item.Id)">
+                                                                <i class="fa fa-check-circle" style="color:White;margin-left:-7px"></i>
+                                                            </a>
+                                                            <a style="height:30px;width:30px" class="btn btn-danger" onclick="cancelFault(@item.Id)">
+                                                                <i class="fa fa-times-circle" style="color:White;margin-left:-7px"></i>
+                                                            </a>
+                                                            <a style="height:30px;width:30px" class="btn btn-warning" onclick="editFault(@item.Id)">
+                                                                <i class="fa fa-edit" style="color:White;margin-left:-7px;"></i>
+                                                            </a>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            <a style="height:30px;width:30px" class="btn btn-info" onclick="undoFault(@item.Id)">
+                                                                <i class="fa fa-undo" style="color:White;margin-left:-7px;"></i>
+                                                            </a>
+                                                            <br />
+                                                            <a style="height:30px;width:30px" class="btn btn-danger" onclick="deleteFault(@item.Id)">
+                                                                <i class="fa fa-trash" style="color:White;margin-left:-7px"></i>
+                                                            </a>
+                                                        </td>
+
+                                                    }
+                                                </tr>
+
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <center><i>Proje bulunamadı!</i></center>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="editProjectReportModalPage"></div>
+<script>
+         $(document).ready(function () {
+          $("#exportTget").click(function () {
+              var url = '@Url.Action("ExportExcelTget")';
+        window.open(url);
+        });
+      });
+    // =======================
+    // SEARCH
+    // =======================
+    $('#table').excelTableFilter({
+        columnSelector: '.filter',    // (optional) if present, will only select <th> with specified class
+        sort: true,                         // (optional) default true
+        search: true                    // (optional) default { a_to_z: 'A to Z', z_to_a: 'Z to A', search: 'Search', select_all: 'Select All' }
+    });
+    // =======================
+    // =======================
+    // =======================
+    function editFault(Id) {
+        $.ajax({
+            url: '/ProjectReport/Edit/?Id=' + Id,
+            success: function (data) {
+                $('#editProjectReportModalPage').html(data);
+                $('#editProjectReportModal').modal('show');
+            }
+        });
+    }
+    // =======================
+    // =======================
+    function completeFault(Id) {
+        Swal.fire({
+            title: 'Projeyi tamamlamak istiyor musunuz?',
+            text: "Proje tamamlandıktan sonra tekrar geri alınamaz!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Evet, onaylıyorum',
+            cancelButtonText: 'İptal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+               $.ajax({
+                url: '@Url.Action("Complete", "ProjectReport")',
+                type: 'POST',
+                dataType: 'json',
+                   data: {
+                    'Id':Id,
+                    'Completed': 'True',
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla tamamlanmıştır!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bir hata oluştu!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+            }
+        })
+    }
+    // ==========================
+    // ==========================
+    function cancelFault(Id) {
+        Swal.fire({
+            title: 'Projeyi iptal etmek istiyor musunuz?',
+            text: "Proje iptal edildikten sonra tekrar geri alınamaz!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Evet, onaylıyorum',
+            cancelButtonText: 'İptal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+               $.ajax({
+                url: '@Url.Action("Cancel", "ProjectReport")',
+                type: 'POST',
+                dataType: 'json',
+                   data: {
+                    'Id':Id,
+                    'Completed': 'True',
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla iptal edilmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bir hata oluştur!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+            }
+        })
+    }
+    // ==========================
+    function deleteFault(Id) {
+        Swal.fire({
+            title: 'Projeyi silmek istiyor musunuz?',
+            text: "Proje silindikten sonra tekrar geri alınamaz!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Evet, onaylıyorum',
+            cancelButtonText: 'İptal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+               $.ajax({
+                url: '@Url.Action("Delete", "ProjectReport")',
+                type: 'POST',
+                dataType: 'json',
+                   data: {
+                    'Id':Id,
+                    'IsDeleted': 'True',
+                    'IsActive': 'False',
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla silinmiştir!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bir hata oluştur!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+            }
+        })
+    }
+     // ==========================
+    function undoFault(Id) {
+        Swal.fire({
+            title: 'Projeyi geri almak istiyor musunuz?',
+            //text: "Arıza silindikten sonra tekrar geri alınamaz!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Evet, onaylıyorum',
+            cancelButtonText: 'İptal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+               $.ajax({
+                url: '@Url.Action("Undo", "ProjectReport")',
+                type: 'POST',
+                dataType: 'json',
+                   data: {
+                    'Id':Id,
+                },
+                success: function (data) {
+                    if (data == true) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Başarıyla geri alınmıştır!',
+                            showConfirmButton: false,
+                            timer: 800
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: 'Bir hata oluştur!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        })
+                    }
+                },
+                error: function (data) {
+                }
+            });
+            }
+        })
+    }
+</script>
